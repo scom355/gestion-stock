@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/app-icon.png?v=10" />
+  <link rel="shortcut icon" href="/app-icon.png?v=10" />
+  <link rel="apple-touch-icon" href="/app-icon.png?v=10" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Carrefour Auto-Stock 🚀</title>
+  <script>
+    // Force unregister any old service worker to stop caching issues
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister().then(function(success) {
+            console.log("Service Worker unregistered: " + success);
+            if(success) window.location.reload();
+          });
+        }
+      });
+    }
+  </script>
+  <link rel="manifest" href="/manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Barcode+39&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

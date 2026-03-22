@@ -1,0 +1,108 @@
+/* === SPOOL HISTORY & BATCH STYLES === */
+
+.header-status-title {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.file-status-badge {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    width: fit-content;
+}
+
+.file-status-badge.pending {
+    background: #fefce8;
+    color: #854d0e;
+    border: 1px solid #fef08a;
+    animation: pulse-status 2s infinite;
+}
+
+@keyframes pulse-status {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.file-status-badge.printed {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+/* History Sidebar Elements */
+.history-date-picker {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 57, 134, 0.03);
+    border-radius: 12px;
+    text-align: left;
+}
+
+.history-date-picker label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--carrefour-blue);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.history-calendar-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid rgba(0, 57, 134, 0.2);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: var(--carrefour-blue);
+    cursor: pointer;
+}
+
+/* History Grid / Batches */
+.history-batches-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+}
+
+.history-batch-wrapper {
+    width: 100%;
+    max-width: 850px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.batch-time-stamp {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #666;
+    padding-left: 20px;
+    border-left: 4px solid #22c55e;
+}
+
+.history-scale {
+    transform: scale(0.95);
+    transform-origin: top center;
+    margin-bottom: 0 !important;
+}
+
+.ticket-preview.printed-style {
+    background-color: #f9fafb;
+    border-style: solid;
+    border-color: #e5e7eb;
+}

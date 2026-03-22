@@ -1,0 +1,248 @@
+@media (max-width: 768px) {
+
+    /* Allow natural scrolling on mobile */
+    html {
+        height: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    body {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        position: static !important;
+        display: block !important;
+        overscroll-behavior: auto !important;
+    }
+
+    .landing-card h3 {
+        font-size: 1rem !important;
+        margin-bottom: 2px !important;
+    }
+
+    .landing-card p {
+        font-size: 0.7rem !important;
+    }
+
+    /* Dashboard / Back Office Kiosk Fix - FIT TO SCREEN */
+    .dashboard-container {
+        height: calc(100vh - 65px) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    .dashboard-layout-engine {
+        flex-direction: column !important;
+        gap: 0px !important;
+        overflow: hidden !important;
+        flex: 1 !important;
+        height: 100% !important;
+        padding: 5px !important;
+        margin-top: 0 !important;
+        display: flex !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Hide the left sidebar text icons but keep a small nav or just hide if kpi is selected */
+    .kpi-left-sidebar {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        padding: 5px !important;
+        flex-direction: row !important;
+        display: none !important;
+        /* Fully hide to give priority to main area */
+    }
+
+    /* If you want to keep the title of what is selected */
+    .dashboard-container.is-split .sidebar-kpi-heading {
+        display: none !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px !important;
+        padding: 4px !important;
+        width: 100% !important;
+        margin-bottom: 5px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .kpi-card {
+        border-radius: 10px !important;
+        padding: 6px 2px !important;
+        min-height: 60px !important;
+        background: #fff !important;
+        border: 1px solid #eee !important;
+    }
+
+    .kpis-dynamic-val {
+        font-size: 0.9rem !important;
+        margin-top: 2px !important;
+    }
+
+    .kpi-label-footer {
+        font-size: 0.45rem !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.2px !important;
+    }
+
+    .kpi-icon-seal {
+        font-size: 1.2rem !important;
+    }
+
+    /* Main Display Area should fill everything */
+    .main-display-area {
+        flex: 1 !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    .full-detail-hub {
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    .stock-list-mini-view,
+    .lookup-module,
+    .spool-view {
+        padding: 10px !important;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        background: #fff !important;
+        border-radius: 15px !important;
+    }
+
+    .mini-table-container {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 5px !important;
+    }
+
+    .mini-table {
+        font-size: 0.75rem !important;
+        min-width: 500px !important;
+    }
+
+    /* Form within Lookup */
+    .lookup-search-box form {
+        gap: 5px !important;
+    }
+
+    .lookup-input {
+        padding: 10px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .btn-mini-search {
+        padding: 0 15px !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Lookup Card on Mobile */
+    .lookup-card {
+        padding: 15px !important;
+        margin-top: 10px !important;
+    }
+
+    .lc-header h4 {
+        font-size: 1.2rem !important;
+    }
+
+    .lc-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
+    .lc-item span {
+        font-size: 1.1rem !important;
+    }
+
+    .lc-actions {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .btn-action-outline {
+        padding: 10px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Standardized padding for views - ALLOW SCROLLING */
+    #root,
+    .app-container,
+    .landing-container,
+    .dashboard-container,
+    .scan-content-wrapper-new,
+    .content-area-full {
+        min-height: 100vh !important;
+        height: auto !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
+        /* Changed from auto to visible to avoid nested scroll locks */
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: 80px !important;
+        /* Give extra room at bottom */
+    }
+
+    .universal-top-bar {
+        height: 60px !important;
+        padding: 0 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+
+    .desktop-logo-rounded {
+        height: 35px !important;
+    }
+
+    .brand-main {
+        font-size: 1.1rem !important;
+    }
+
+    .brand-addr {
+        display: none !important;
+    }
+
+    .top-right-nav {
+        gap: 4px !important;
+    }
+
+    .nav-btn,
+    .nav-btn-add {
+        padding: 4px 6px !important;
+        font-size: 0.6rem !important;
+        border-radius: 8px !important;
+    }
+
+    /* RESULT MODAL FIX */
+    .scan-results-modal {
+        width: 95% !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+
+    .res-p-price-main {
+        font-size: 3.5rem !important;
+    }
+
+    .btn-modal-action {
+        padding: 15px !important;
+        font-size: 1rem !important;
+    }
+}

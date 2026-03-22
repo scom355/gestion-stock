@@ -1,0 +1,68 @@
+/* === FULL SCREEN DASHBOARD === */
+
+.dashboard-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.view-header-row {
+    flex-shrink: 0;
+    padding: 12px 25px;
+    background: white;
+    border-bottom: 1px solid rgba(0, 57, 134, 0.08);
+    /* Minimal header border */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    z-index: 10;
+}
+
+.dashboard-layout-engine {
+    flex: 1;
+    display: flex;
+    gap: 0;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.main-display-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 25px;
+    background: #f5f7fa;
+    /* Exactly same background as sidebar */
+    border-left: 1px solid rgba(0, 57, 134, 0.05);
+    /* Extremely subtle hint of separation */
+}
+
+/* Remove scrollbar styling but keep functionality */
+.main-display-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.main-display-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.main-display-area::-webkit-scrollbar-thumb {
+    background: rgba(0, 57, 134, 0.1);
+    border-radius: 10px;
+}
+
+.main-display-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 57, 134, 0.2);
+}

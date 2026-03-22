@@ -1,0 +1,17 @@
+{
+    "short_name": "Carrefour",
+    "name": "Carrefour Staff Assistant",
+    "icons": [
+        {
+            "src": "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Carrefour_logo.svg/1200px-Carrefour_logo.svg.png",
+            "sizes": "192x192 512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "start_url": "/CarrefourLauncher.html",
+    "display": "standalone",
+    "theme_color": "#003986",
+    "background_color": "#ffffff",
+    "orientation": "portrait"
+}

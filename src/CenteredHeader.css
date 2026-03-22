@@ -1,0 +1,77 @@
+/* === SEAMLESS UNIFIED HEADER & KPI AREA === */
+
+.view-header-row {
+    display: grid !important;
+    grid-template-columns: 200px 1fr 200px;
+    align-items: center;
+    padding: 5px 25px;
+    background: #f5f7fa;
+    /* Exact same as dashboard background */
+    min-height: 80px;
+    border-bottom: none !important;
+    /* Removed separating border */
+    box-shadow: none !important;
+    /* Removed separating shadow */
+}
+
+.header-column-left,
+.header-column-right {
+    display: flex;
+}
+
+.header-column-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.header-logo-main {
+    height: 60px;
+    width: auto;
+    opacity: 1;
+    /* Crisp and clear */
+}
+
+.header-title-stack h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 950;
+    color: var(--carrefour-blue);
+    line-height: 1;
+    letter-spacing: -0.8px;
+}
+
+.header-title-stack p {
+    margin: 5px 0 0 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* === ELIMINATE ALL VERTICAL SEPARATION === */
+
+.dashboard-layout-engine {
+    gap: 0 !important;
+    margin: 0 !important;
+    border-top: none !important;
+}
+
+.kpi-left-sidebar {
+    background: #f5f7fa !important;
+    /* Unified background */
+    border-right: 1px solid rgba(0, 57, 134, 0.05);
+    /* Very subtle side border only */
+    padding-top: 10px;
+    /* Slight breathing room at top */
+}
+
+.main-display-area {
+    background: #f5f7fa !important;
+    /* Unified background */
+    padding: 20px !important;
+    border-top: none !important;
+}

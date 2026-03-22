@@ -1,0 +1,148 @@
+/* === COMPACT ADD PRODUCT FORM === */
+
+.small-add-modal-compact {
+    background: white;
+    border-radius: 18px;
+    padding: 15px;
+    max-width: 420px;
+    width: 95%;
+    max-height: none;
+    overflow: visible;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+}
+
+.input-group-compact {
+    margin-bottom: 8px;
+}
+
+.input-group-compact label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--carrefour-blue);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.input-compact {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid rgba(0, 57, 134, 0.15);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    outline: none;
+}
+
+.input-compact:focus {
+    border-color: var(--carrefour-blue);
+    box-shadow: 0 0 0 3px rgba(0, 57, 134, 0.1);
+}
+
+.input-compact::placeholder {
+    color: #ccc;
+    font-weight: 500;
+}
+
+/* Triple Row Layout (Compra, Venta, Margen) */
+.input-row-triple {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* Dual Row Layout (Stock, Oferta) */
+.input-row-dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* Margin Display (Read-only) */
+.margin-display {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    color: var(--carrefour-blue);
+    font-weight: 900;
+    text-align: center;
+    cursor: not-allowed;
+    border-color: rgba(0, 57, 134, 0.2);
+}
+
+/* Submit Button */
+.btn-submit-compact {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--carrefour-blue), #0056d6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 5px;
+    box-shadow: 0 10px 30px rgba(0, 57, 134, 0.3);
+}
+
+.btn-submit-compact:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 57, 134, 0.4);
+}
+
+/* Dark Mode */
+.app-container.dark .small-add-modal-compact {
+    background: rgba(20, 22, 35, 0.95);
+}
+
+.app-container.dark .input-compact {
+    background: rgba(30, 32, 45, 0.9);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-container.dark .input-group-compact label {
+    color: #60a5fa;
+}
+
+.app-container.dark .margin-display {
+    background: rgba(96, 165, 250, 0.1);
+    color: #60a5fa;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .input-row-triple {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 4px;
+        width: 100%;
+    }
+
+    .input-group-compact label {
+        font-size: 0.55rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .input-row-dual {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .small-add-modal-compact {
+        padding: 10px 12px;
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+        max-height: 98vh;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .input-compact {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+}

@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# Force HTTPS (Optional but good)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Support API Proxy (Standard PHP Handler)
+RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+
+
+# Support React Router (SPA) and static assets
+# If the requested resource exists as a file or directory, serve it directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Otherwise, redirect everything else to index.html (SPA routing)
+RewriteRule ^ index.html [L]

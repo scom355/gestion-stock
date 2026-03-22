@@ -1,0 +1,57 @@
+/* === ABSOLUTE SEAMLESS MERGE: HEADER & DASHBOARD === */
+
+.dashboard-container {
+    background: #f5fafe !important;
+    /* Extremely clean blue-ish white */
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.view-header-row {
+    background: #f5fafe !important;
+    /* Unified background */
+    margin: 0 !important;
+    padding: 10px 30px !important;
+    /* Minimal vertical padding */
+    border-bottom: 1px solid rgba(0, 57, 134, 0.05) !important;
+    /* Extremely thin line for subtle hint */
+    box-shadow: none !important;
+    min-height: auto !important;
+    height: 70px !important;
+}
+
+.dashboard-layout-engine {
+    margin: 0 !important;
+    /* REMOVED THE 30PX MARGIN-TOP COMPLETELY */
+    padding: 0 !important;
+    gap: 0 !important;
+    flex: 1;
+    /* Occupy rest of screen */
+    display: flex;
+    background: #f5fafe !important;
+    border-top: none !important;
+    /* Ensure no border between header and kpi */
+}
+
+/* Sidebar & Main Area - Ensure backgrounds match perfectly */
+.kpi-left-sidebar {
+    margin: 0 !important;
+    background: #f5fafe !important;
+    border-right: 1px solid rgba(0, 57, 134, 0.05) !important;
+}
+
+.main-display-area {
+    margin: 0 !important;
+    background: #f5fafe !important;
+    padding: 20px !important;
+}
+
+/* Cleanup old styles that might interfere */
+.bolted-card-sidebar,
+.sidebar-hint {
+    display: none !important;
+    /* Removing old components */
+}

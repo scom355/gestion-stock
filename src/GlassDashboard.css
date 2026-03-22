@@ -1,0 +1,56 @@
+/* === SEAMLESS GLASS DASHBOARD (MATCHING LANDING) === */
+
+.dashboard-container {
+    background: transparent !important;
+    /* See-through to app background */
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.view-header-row {
+    background: rgba(255, 255, 255, 0.4) !important;
+    /* Glassmorphism - Match landing feel */
+    backdrop-filter: blur(10px);
+    margin: 0 !important;
+    padding: 10px 30px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05) !important;
+    min-height: auto !important;
+    height: 80px !important;
+}
+
+.dashboard-layout-engine {
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    flex: 1;
+    display: flex;
+    background: transparent !important;
+}
+
+/* Sidebar & Main Area - Transparent to see the blurred background */
+.kpi-left-sidebar {
+    margin: 0 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(5px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.main-display-area {
+    margin: 0 !important;
+    background: transparent !important;
+    padding: 20px !important;
+}
+
+/* ROUNDED MONOGRAM EDGES */
+.header-logo-main {
+    height: 65px !important;
+    width: auto !important;
+    border-radius: 20px;
+    /* Rounded edges as requested */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    opacity: 1 !important;
+}

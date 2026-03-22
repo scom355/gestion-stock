@@ -1,0 +1,222 @@
+/* === PREMIUM DASHBOARD STYLES === */
+
+/* Search & Filters Bar */
+.dashboard-controls-bar {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.search-box-premium {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+}
+
+.search-box-premium:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 57, 134, 0.15);
+}
+
+.search-icon {
+    font-size: 1.2rem;
+}
+
+.search-input-premium {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.search-input-premium::placeholder {
+    color: #999;
+    font-weight: 500;
+}
+
+.filter-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 2px solid rgba(0, 57, 134, 0.1);
+    background: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--carrefour-blue);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-select:hover {
+    border-color: var(--carrefour-blue);
+    transform: translateY(-2px);
+}
+
+.filter-btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    background: white;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn.active {
+    background: var(--carrefour-blue);
+    color: white;
+    border-color: var(--carrefour-blue);
+    box-shadow: 0 5px 20px rgba(0, 57, 134, 0.3);
+}
+
+/* Live Stats Row */
+.live-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--accent-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card.blue {
+    --accent-color: #003986;
+}
+
+.stat-card.orange {
+    --accent-color: #ff6b35;
+}
+
+.stat-card.green {
+    --accent-color: #009E49;
+}
+
+.stat-card.purple {
+    --accent-color: #8b5cf6;
+}
+
+.stat-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 950;
+    color: var(--accent-color);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Dark Mode Support */
+.app-container.dark .dashboard-controls-bar {
+    background: rgba(20, 22, 35, 0.8);
+}
+
+.app-container.dark .search-box-premium,
+.app-container.dark .filter-select,
+.app-container.dark .filter-btn {
+    background: rgba(30, 32, 45, 0.9);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-container.dark .search-input-premium {
+    color: white;
+}
+
+.app-container.dark .search-input-premium::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.app-container.dark .stat-card {
+    background: rgba(30, 32, 45, 0.9);
+}
+
+.app-container.dark .stat-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .live-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-controls-bar {
+        flex-direction: column;
+    }
+
+    .filter-group {
+        flex-wrap: wrap;
+    }
+
+    .live-stats-row {
+        grid-template-columns: 1fr;
+    }
+}

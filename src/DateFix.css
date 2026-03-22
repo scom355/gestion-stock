@@ -1,0 +1,32 @@
+/* Date Input Calendar Icon Fix */
+.input-compact[type="date"] {
+    position: relative;
+    padding-right: 35px;
+}
+
+.input-compact[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 1.3rem;
+    opacity: 1;
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(119%);
+    transition: all 0.3s;
+}
+
+.input-compact[type="date"]::-webkit-calendar-picker-indicator:hover {
+    transform: scale(1.15);
+    filter: invert(48%) sepia(79%) saturate(3000%) hue-rotate(86deg) brightness(110%) contrast(130%);
+}
+
+/* For Firefox */
+.input-compact[type="date"]::-moz-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 1;
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(119%);
+}
+
+.input-compact[type="date"]::-moz-calendar-picker-indicator:hover {
+    transform: scale(1.15);
+    filter: invert(48%) sepia(79%) saturate(3000%) hue-rotate(86deg) brightness(110%) contrast(130%);
+}
