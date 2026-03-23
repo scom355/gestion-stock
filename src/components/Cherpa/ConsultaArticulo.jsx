@@ -184,6 +184,15 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
                   onClick={toggleKeyboard}
                   title={keyboardForced ? "Desactivar Teclado" : "Activar Teclado"}
                 >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                    <path d="M21 15a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <line x1="7" y1="10" x2="7" y2="10" />
+                    <line x1="11" y1="10" x2="11" y2="10" />
+                    <line x1="15" y1="10" x2="15" y2="10" />
+                    <line x1="7" y1="14" x2="7" y2="14" />
+                    <line x1="11" y1="14" x2="11" y2="14" />
+                    <line x1="15" y1="14" x2="15" y2="14" />
+                  </svg>
                 </button>
                 <button className="btn-cam-trigger" onClick={() => setScanMode('camera')}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
@@ -268,7 +277,7 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
         .search-bar-premium:focus-within { background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: #004691; }
         .search-bar-premium.cam-on { border-color: #E1000F; background: #fef2f2; }
         .search-icon-glass { font-size: 18px; opacity: 0.5; pointer-events: none; }
-        .search-bar-premium input { flex: 1; border: none; background: transparent; outline: none; font-size: 16px; font-weight: 800; color: #000000; height: 100%; }
+        .search-bar-premium input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 16px; font-weight: 800; color: #000000; height: 100%; }
         
         .search-actions-modern { display: flex; gap: 8px; }
         .btn-keyboard-toggle { background: #f1f5f9; color: #64748b; border: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; transition: 0.2s; }

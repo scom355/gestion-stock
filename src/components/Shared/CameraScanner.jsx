@@ -24,7 +24,7 @@ const CameraScanner = ({ onScan }) => {
         try {
           const Quagga = (await import('@ericblade/quagga2')).default;
           Quagga.stop();
-        } catch (e) {}
+        } catch (e) { }
         quaggaRunning = false;
       }
       if (scannerLoopRef.current) cancelAnimationFrame(scannerLoopRef.current);
@@ -42,9 +42,9 @@ const CameraScanner = ({ onScan }) => {
         gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
         gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
         osc.start(); osc.stop(audioCtx.currentTime + 0.12);
-      } catch (e) {}
+      } catch (e) { }
       if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-      
+
       onScan(code);
       stopScanner();
     };
@@ -52,10 +52,10 @@ const CameraScanner = ({ onScan }) => {
     const start = async () => {
       try {
         if (!window.isSecureContext && window.location.hostname !== 'localhost') {
-           setErrorHeader("⚠️ CONEXIÓN NO SEGURA");
-           setErrorMsg("Chrome/Android requiere HTTPS para usar la cámara. Por favor usa HTTPS.");
-           setHasError(true);
-           return;
+          setErrorHeader("⚠️ CONEXIÓN NO SEGURA");
+          setErrorMsg("Chrome/Android requiere HTTPS para usar la cámara. Por favor usa HTTPS.");
+          setHasError(true);
+          return;
         }
 
         stream = await navigator.mediaDevices.getUserMedia({
@@ -63,80 +63,88 @@ const CameraScanner = ({ onScan }) => {
             facingMode: "environment",
             width: { ideal: 1280 },
             height: { ideal: 720 },
-            frameRate: { ideal: 60 }
+            frameRate: { ideal: 60 },
+            advanced: [{ focusMode: "continuous" }, { autoFocus: "continuous" }]
           }
         });
 
         if (!mounted) return stopScanner();
         if (videoRef.current) videoRef.current.srcObject = stream;
 
-        if ('BarcodeDetector' in window) {
-          const detector = new window.BarcodeDetector({
-            formats: ['ean_13', 'ean_8', 'code_128', 'upc_a', 'upc_e']
-          });
-          setActiveEngine("NATIVE SENSOR (ULTRA FAST) ⚡");
-          
-          let lastDetectionTime = 0;
-          const loop = async (time) => {
-            if (!mounted || !videoRef.current) return;
-            if (time - lastDetectionTime > 50) {
-              if (videoRef.current.readyState >= 2) {
-                try {
-                  const barcodes = await detector.detect(videoRef.current);
-                  if (barcodes.length > 0) {
-                    return handleSuccess(barcodes[0].rawValue);
-                  }
-                } catch (e) {}
-              }
-              lastDetectionTime = time;
-            }
-            scannerLoopRef.current = requestAnimationFrame(loop);
-          };
-          scannerLoopRef.current = requestAnimationFrame(loop);
-        } else {
-          setActiveEngine("QUAGGA2 SCANNER (iOS COMPATIBLE) 🔍");
-          const Quagga = (await import('@ericblade/quagga2')).default;
-          Quagga.init({
-            inputStream: {
-              name: "Live",
-              type: "LiveStream",
-              target: videoRef.current,
-              constraints: { 
-                facingMode: "environment",
-                width: { ideal: 640 }, 
-                height: { ideal: 480 },
-                advanced: [{ focusMode: 'continuous' }]
-              }
-            },
-            locator: {
-              patchSize: "small",
-              halfSample: true
-            },
-            decoder: {
-              readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader", "upc_e_reader"]
-            },
-            locate: true,
-            numOfWorkers: navigator.hardwareConcurrency || 4,
-            frequency: 20
-          }, (err) => {
-            if (err) { setHasError(true); return; }
-            if (mounted) { Quagga.start(); quaggaRunning = true; }
-          });
+        // Give the camera a tiny moment to auto-focus before banging it with image processing
+        setTimeout(async () => {
+          if (!mounted) return;
+          if ('BarcodeDetector' in window) {
+            const detector = new window.BarcodeDetector({
+              formats: ['ean_13', 'ean_8', 'code_128', 'upc_a', 'upc_e']
+            });
+            setActiveEngine("NATIVE SENSOR (ULTRA FAST) ⚡");
 
-          let lastCode = '';
-          let lastCodeCount = 0;
-          Quagga.onDetected((res) => {
-            const code = res?.codeResult?.code;
-            if (!code) return;
-            if (code === lastCode) { lastCodeCount++; } else { lastCode = code; lastCodeCount = 1; }
-            if (lastCodeCount >= 3) {
-              handleSuccess(code);
-              lastCode = '';
-              lastCodeCount = 0;
-            }
-          });
-        }
-        setIsScanning(true);
+            let lastDetectionTime = 0;
+            const loop = async (time) => {
+              if (!mounted || !videoRef.current) return;
+              // Snapping every 15ms makes it crazy fast (approx 60fps check)
+              if (time - lastDetectionTime > 15) {
+                if (videoRef.current.readyState >= 2) {
+                  try {
+                    const barcodes = await detector.detect(videoRef.current);
+                    if (barcodes.length > 0) {
+                      return handleSuccess(barcodes[0].rawValue);
+                    }
+                  } catch (e) { }
+                }
+                lastDetectionTime = time;
+              }
+              scannerLoopRef.current = requestAnimationFrame(loop);
+            };
+            scannerLoopRef.current = requestAnimationFrame(loop);
+          } else {
+            setActiveEngine("QUAGGA2 SCANNER (iOS COMPATIBLE) 🔍");
+            const Quagga = (await import('@ericblade/quagga2')).default;
+            Quagga.init({
+              inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: videoRef.current,
+                constraints: {
+                  facingMode: "environment",
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                  aspectRatio: { min: 1, max: 2 },
+                  advanced: [{ focusMode: 'continuous' }]
+                }
+              },
+              locator: {
+                patchSize: "large", // Larger patches grab bigger chunks, highly reducing focus jitter
+                halfSample: false   // Do not compress sample to improve accuracy
+              },
+              decoder: {
+                readers: ["ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader", "code_128_reader"]
+              },
+              locate: true,
+              numOfWorkers: Math.max(navigator.hardwareConcurrency || 4, 4),
+              frequency: 60 // Run at maximum possible frequency
+            }, (err) => {
+              if (err) { setHasError(true); return; }
+              if (mounted) { Quagga.start(); quaggaRunning = true; }
+            });
+
+            let lastCode = '';
+            let lastCodeCount = 0;
+            Quagga.onDetected((res) => {
+              const code = res?.codeResult?.code;
+              if (!code) return;
+              if (code === lastCode) { lastCodeCount++; } else { lastCode = code; lastCodeCount = 1; }
+              // Reduced strictly to 2 hits for instant snap similar to official apps
+              if (lastCodeCount >= 2) {
+                handleSuccess(code);
+                lastCode = '';
+                lastCodeCount = 0;
+              }
+            });
+          }
+          setIsScanning(true);
+        }, 300); // 300ms warmup delay helps autofocus
       } catch (err) {
         setHasError(true);
         setErrorMsg("Sin acceso a cámara o permiso denegado.");
@@ -153,7 +161,7 @@ const CameraScanner = ({ onScan }) => {
       const track = videoRef.current.srcObject.getVideoTracks()[0];
       await track.applyConstraints({ advanced: [{ torch: !torchOn }] });
       setTorchOn(!torchOn);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   if (hasError) {

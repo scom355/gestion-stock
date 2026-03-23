@@ -6,12 +6,20 @@ import SpoolView from './SpoolView';
 import AddProductView from './AddProductView';
 import BandejaView from './BandejaView';
 
-import iconScanner from '../../assets/cherpa/scanner.webp';
-import iconPrecio from '../../assets/cherpa/precio.webp';
-import iconAdd from '../../assets/cherpa/add_product.png';
-import iconPedidos from '../../assets/cherpa/pedidos.jpg';
-import iconBandejas from '../../assets/cherpa/bandejas.avif';
+import iconScanner from '../../assets/cherpa/consulta articulo.jpeg';
+import iconEditar from '../../assets/cherpa/setting.jpeg';
+import iconTickets from '../../assets/cherpa/solicitar ticket.jpeg';
+import iconAdd from '../../assets/cherpa/añadir producto.jpeg';
+import iconPedidos from '../../assets/cherpa/pedido.jpeg';
+import iconRecibo from '../../assets/cherpa/recibo.jpeg';
+import iconFaltas from '../../assets/cherpa/falta.jpeg';
+import iconChat from '../../assets/cherpa/chat.jpeg';
+import iconBalance from '../../assets/cherpa/balance.jpeg';
+import iconMerma from '../../assets/cherpa/merma.jpeg';
+import iconStaff from '../../assets/cherpa/staff.jpeg';
 import iconSpool from '../../assets/cherpa/spool.avif';
+import iconReports from '../../assets/cherpa/reports.jpeg';
+import iconBandejas from '../../assets/cherpa/carne_new.webp';
 
 const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, removeFromSpool, ticketSpool, setTicketSpool, onGeneratePDF, onAddProduct, onUpdateProduct, activeSubPage, setActiveSubPage, CameraScanner, API_BASE, ticketHistory = [], inputRef }) => {
   const [predefinedBarcode, setPredefinedBarcode] = useState('');
@@ -24,10 +32,16 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
       icon: <img src={iconScanner} alt="Scanner" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
-      id: 'precio',
-      label: 'Precio',
-      color: '#004691',
-      icon: <img src={iconPrecio} alt="Precio" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      id: 'editar_producto',
+      label: 'Editar producto',
+      color: '#003986',
+      icon: <img src={iconEditar} alt="Editar" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'tickets',
+      label: 'Solicitar etiquetas',
+      color: '#16A34A',
+      icon: <img src={iconTickets} alt="Tickets" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
       id: 'add_product',
@@ -51,21 +65,13 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
       id: 'recibo',
       label: 'Recibo',
       color: '#0891B2',
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM12 22V12" />
-        </svg>
-      )
+      icon: <img src={iconRecibo} alt="Recibo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
       id: 'faltas',
       label: 'Faltas',
       color: '#DB2777',
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 13h6M9 17h3" />
-        </svg>
-      )
+      icon: <img src={iconFaltas} alt="Faltas" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
       id: 'spool',
@@ -77,43 +83,31 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
       id: 'chat',
       label: 'Chat',
       color: '#0396A6',
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 1 1-7.6-14.7 8.38 8.38 0 0 1 3.8.9L21 3l-1.5 5.5z" />
-        </svg>
-      )
+      icon: <img src={iconChat} alt="Chat" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
       id: 'balance',
-      label: 'Balance',
+      label: 'Carteleria',
       color: '#65A30D',
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M18 20V10M12 20V4M6 20v-6" />
-        </svg>
-      )
+      icon: <img src={iconBalance} alt="Balance" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
       id: 'merma',
       label: 'Merma',
       color: '#475569',
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM12 22V12" />
-          <path d="M11 9l-2 4h4l-2 4" />
-        </svg>
-      )
+      icon: <img src={iconMerma} alt="Merma" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     },
     {
       id: 'staff',
       label: 'Staff',
       color: '#1E293B',
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="4" width="18" height="16" rx="2" />
-          <circle cx="12" cy="10" r="3" />
-        </svg>
-      )
+      icon: <img src={iconStaff} alt="Staff" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'reports',
+      label: 'Reports',
+      color: '#F43F5E',
+      icon: <img src={iconReports} alt="Reports" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     }
   ];
 
@@ -165,7 +159,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
       });
     }
     // Generate PDF directly - skipDelete=true so spool is NOT affected
-    const filename = `carne-${new Date().toISOString().slice(0,10)}-${Date.now()}.pdf`;
+    const filename = `carne-${new Date().toISOString().slice(0, 10)}-${Date.now()}.pdf`;
     await onGeneratePDF({ filename, orientation: 'landscape' }, items, true);
     setWeight('');
     setKiloPrice('');
@@ -231,10 +225,24 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
                 inputRef={inputRef}
               />
             )}
-            {activeSubPage === 'precio' && (
+            {activeSubPage === 'editar_producto' && (
               <PrecioView
+                forceMode="edit"
                 products={products}
                 addToSpool={addToSpool}
+                onAddProduct={handleAddProductClick}
+                onUpdateProduct={onUpdateProduct}
+                CameraScanner={CameraScanner}
+                API_BASE={API_BASE}
+                inputRef={inputRef}
+              />
+            )}
+            {activeSubPage === 'tickets' && (
+              <PrecioView
+                forceMode="ticket"
+                products={products}
+                addToSpool={addToSpool}
+                ticketSpool={ticketSpool}
                 onAddProduct={handleAddProductClick}
                 onUpdateProduct={onUpdateProduct}
                 CameraScanner={CameraScanner}
@@ -273,7 +281,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
                 onBack={() => setActiveSubPage(null)}
               />
             )}
-            {!['scanner', 'precio', 'spool', 'add_product', 'bandejas'].includes(activeSubPage) && (
+            {!['scanner', 'editar_producto', 'tickets', 'spool', 'add_product', 'bandejas', 'reports'].includes(activeSubPage) && (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <div style={{ fontSize: '50px', marginBottom: '20px' }}>🚀</div>
                 <h2 style={{ color: '#004691', fontWeight: 900 }}>{activeSubPage.toUpperCase()}</h2>
@@ -289,7 +297,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
           position: fixed;
           top: 0;
           left: 0;
-          width: 100vw;
+          width: 100%;
           height: 100vh;
           background: #FFFFFF;
           display: flex;
@@ -304,11 +312,12 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
 
         .cherpa-grid {
           display: grid;
-          grid-template-columns: repeat(3, 110px);
-          gap: 25px 15px;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 15px 8px;
           justify-content: center;
           align-content: flex-start;
           width: 100%;
+          max-width: 500px;
           padding: 10px;
           margin-top: 25px;
           padding-bottom: 110px;

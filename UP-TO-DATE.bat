@@ -41,7 +41,7 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo [2/5] 📦 Creating Deployment Package (deploy.tar.gz)...
 :: Excluding db.json to avoid overwriting live customer data on Hostinger
-tar -czf deploy.tar.gz dist server.cjs .htaccess api package.json database.sql public sync_remote_db.cjs
+tar -czf deploy.tar.gz dist server.cjs .htaccess api package.json public sync_remote_db.cjs
 if %ERRORLEVEL% NEQ 0 (
     echo ❌ ERROR: Failed to create archive.
     pause
@@ -63,7 +63,7 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo [4/5] 🔄 Extracting and Syncing on Server...
 :: 1. Go to path 2. Extract 3. Move dist to root 4. Sync SQL 5. Install deps 6. Restart server
-ssh -i "%KEY_PATH%" -p %PORT% %USER%@%HOST_IP% "cd %REMOTE_PATH% && tar -xzf deploy.tar.gz --strip-components=0 && cp -r dist/* . && rm -rf dist deploy.tar.gz && chmod -R 755 public api && export PATH=/opt/alt/alt-nodejs20/root/usr/bin/:$PATH && npm install --production && pkill -9 -f server.cjs || true && sleep 2 && nohup node server.cjs > server.log 2>&1 &"
+ssh -i "%KEY_PATH%" -p %PORT% %USER%@%HOST_IP% "cd %REMOTE_PATH% && tar -xzf deploy.tar.gz --strip-components=0 && cp -r dist/* . && rm -rf dist deploy.tar.gz && chmod -R 755 public api && export PATH=/opt/alt/alt-nodejs20/root/usr/bin/:$PATH && npm install --production && npm prune --production && pkill -9 -f server.cjs || true && sleep 2 && nohup node server.cjs > server.log 2>&1 &"
 
 :: --- 5. CLEANUP ---
 echo.

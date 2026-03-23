@@ -58,10 +58,10 @@ const readJSON = () => {
     }
 };
 
-const writeJSON = async (data) => {
+const writeJSON = (data) => {
     try {
         dbCache = data; // Update cache immediately
-        await fs.promises.writeFile(DB_FILE, JSON.stringify(data, null, 2));
+        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
     } catch (e) {
         console.error('❌ Database Write Failed:', e);
     }
@@ -372,7 +372,7 @@ app.post('/api/spool', async (req, res) => {
     }
     const db = readJSON();
     db.ticket_spool = [...(db.ticket_spool || []), ...items];
-    await writeJSON(db);
+    writeJSON(db);
     res.json({ success: true });
 });
 
@@ -383,7 +383,7 @@ app.delete('/api/spool', async (req, res) => {
         } else {
             const db = readJSON();
             db.ticket_spool = [];
-            await writeJSON(db);
+            writeJSON(db);
         }
         res.json({ success: true });
     } catch (e) {
@@ -399,7 +399,7 @@ app.delete('/api/spool/:id', async (req, res) => {
         } else {
             const db = readJSON();
             db.ticket_spool = (db.ticket_spool || []).filter((_, idx) => idx != id && _.id != id);
-            await writeJSON(db);
+            writeJSON(db);
         }
         res.json({ success: true });
     } catch (e) {
@@ -541,7 +541,7 @@ app.post('/api/products', async (req, res) => {
                 try {
                     const db = readJSON();
                     db.products.push(newItem);
-                    await writeJSON(db);
+                    writeJSON(db);
                     console.log('📦 JSON Backup Updated (Background)');
                 } catch (jsonErr) { console.error('Backup fail:', jsonErr); }
             };
@@ -552,7 +552,7 @@ app.post('/api/products', async (req, res) => {
 
         const db = readJSON();
         db.products.push(newItem);
-        await writeJSON(db);
+        writeJSON(db);
         console.log('✅ Product added to JSON (Standalone), ID:', newItem.id);
         res.json({ success: true, id: newItem.id });
     } catch (e) {
@@ -584,7 +584,7 @@ app.put('/api/product/:id', async (req, res) => {
                     const idx = db.products.findIndex(p => p.id == req.params.id || p.barcode == req.params.id || p.barcode == req.body.barcode);
                     if (idx !== -1) {
                         db.products[idx] = { ...db.products[idx], ...req.body };
-                        await writeJSON(db);
+                        writeJSON(db);
                         console.log('📦 JSON Backup Updated (Background)');
                     }
                 } catch (e) { console.error('JSON Sync fail'); }
@@ -597,7 +597,7 @@ app.put('/api/product/:id', async (req, res) => {
         const idx = db.products.findIndex(p => p.id == req.params.id);
         if (idx !== -1) {
             db.products[idx] = { ...db.products[idx], ...req.body };
-            await writeJSON(db);
+            writeJSON(db);
             return res.json({ success: true });
         }
         res.status(404).json({ error: 'Not found' });
@@ -656,7 +656,7 @@ app.post('/api/sales', async (req, res) => {
                     const pIdx = db.products.findIndex(p => p.id == item.id || p.barcode == item.barcode);
                     if (pIdx !== -1) db.products[pIdx].stock_current -= item.qty;
                 });
-                await writeJSON(db);
+                writeJSON(db);
                 console.log('📦 JSON Backup Updated');
             } catch (jsonErr) { console.warn('JSON Sync failed'); }
 
@@ -674,7 +674,7 @@ app.post('/api/sales', async (req, res) => {
             }
         });
 
-        await writeJSON(db);
+        writeJSON(db);
         res.json({ success: true, id: newSale.id });
     } catch (e) {
         console.error('❌ Sale error:', e.message);
@@ -724,7 +724,7 @@ app.post('/api/parked-sales', async (req, res) => {
         const db = readJSON();
         if (!db.parked_sales) db.parked_sales = [];
         db.parked_sales.push({ id, cart_data, timestamp });
-        await writeJSON(db);
+        writeJSON(db);
         res.json({ success: true });
     } catch (e) {
         res.status(500).json({ error: e.message });
@@ -760,7 +760,7 @@ app.delete('/api/parked-sales/:id', async (req, res) => {
 
         const db = readJSON();
         db.parked_sales = (db.parked_sales || []).filter(ps => ps.id !== req.params.id);
-        await writeJSON(db);
+        writeJSON(db);
         res.json({ success: true });
     } catch (e) {
         res.status(500).json({ error: e.message });

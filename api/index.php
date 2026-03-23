@@ -177,13 +177,15 @@ function send_json($data, $code = 200)
 
     case ($api_path == '/products' && $method == 'POST'):
         if ($useMySQL) {
+            $expiry = (!empty($data['expiry'])) ? $data['expiry'] : null;
             $stmt = $conn->prepare("INSERT INTO products (barcode, name, sell_price, price_buy, stock_current, expiry, offer) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssddisi", $data['barcode'], $data['name'], $data['sell_price'], $data['price_buy'], $data['stock_current'], $data['expiry'], $data['offer']);
+            $stmt->bind_param("ssddisi", $data['barcode'], $data['name'], $data['sell_price'], $data['price_buy'], $data['stock_current'], $expiry, $data['offer']);
             if ($stmt->execute()) {
                 $id = $conn->insert_id;
                 send_json(["success" => true, "id" => $id]);
             }
-            send_json(["success" => false, "error" => $conn->error], 500);
+            log_msg("❌ SAVE ERROR: " . $conn->error . " | BODY: " . $body);
+            send_json(["success" => false, "error" => $conn->error, "query" => $data], 500);
         }
         // JSON Fallback logic...
         $db = get_db_json();
@@ -213,9 +215,14 @@ function send_json($data, $code = 200)
 
             foreach ($allowedFields as $field => $type) {
                 if (isset($data[$field])) {
+                    $val = $data[$field];
+                    if ($field === 'expiry' && empty($val)) {
+                        $val = null;
+                        // For null we still use 's' in bind_param and it works
+                    }
                     $updates[] = "$field = ?";
                     $types .= $type;
-                    $vals[] = $data[$field];
+                    $vals[] = $val;
                 }
             }
 

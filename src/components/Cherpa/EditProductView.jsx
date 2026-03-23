@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const EditProductView = ({ product, onUpdate, onCancel, CameraScanner }) => {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ const EditProductView = ({ product, onUpdate, onCancel, CameraScanner }) => {
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
-    let finalValue = name === 'name' ? value.toUpperCase() : value;
+    let finalValue = value;
 
     if (name === 'offer') {
       finalValue = checked ? '1' : '0';
@@ -65,7 +65,7 @@ const EditProductView = ({ product, onUpdate, onCancel, CameraScanner }) => {
     setIsSaving(true);
     const dataToUpdate = {
       barcode: formData.barcode,
-      name: formData.name,
+      name: formData.name.toUpperCase(),
       price_buy: formData.price_buy,
       sell_price: formData.sell_price,
       offer: formData.offer,
@@ -89,16 +89,16 @@ const EditProductView = ({ product, onUpdate, onCancel, CameraScanner }) => {
     <div className="edit-product-view-modern">
       {showCamera && CameraScanner && (
         <div className="camera-overlay-mini">
-           <div className="camera-container-v2">
-              <button type="button" className="camera-top-close-btn" onClick={() => setShowCamera(false)}>✕</button>
-              <CameraScanner 
-                onScan={(code) => {
-                  setFormData(prev => ({ ...prev, barcode: code }));
-                  setShowCamera(false);
-                }} 
-              />
-              <button type="button" className="btn-close-cam" onClick={() => setShowCamera(false)}>CERRAR</button>
-           </div>
+          <div className="camera-container-v2">
+            <button type="button" className="camera-top-close-btn" onClick={() => setShowCamera(false)}>✕</button>
+            <CameraScanner
+              onScan={(code) => {
+                setFormData(prev => ({ ...prev, barcode: code }));
+                setShowCamera(false);
+              }}
+            />
+            <button type="button" className="btn-close-cam" onClick={() => setShowCamera(false)}>CERRAR</button>
+          </div>
         </div>
       )}
 
@@ -108,14 +108,14 @@ const EditProductView = ({ product, onUpdate, onCancel, CameraScanner }) => {
         <div className="form-section">
           <label>CÓDIGO DE BARRAS</label>
           <div className="input-with-icon">
-              <input ref={barcodeRef} name="barcode" type="text" inputMode="numeric" value={formData.barcode} onChange={handleChange} required />
-              <div className="scan-mini-icon" onClick={() => setShowCamera(true)}>📸</div>
+            <input ref={barcodeRef} name="barcode" type="tel" inputMode="numeric" value={formData.barcode} onChange={handleChange} required />
+            <div className="scan-mini-icon" onClick={() => setShowCamera(true)}>📸</div>
           </div>
         </div>
 
         <div className="form-section">
           <label>NOMBRE DEL PRODUCTO</label>
-          <input name="name" value={formData.name} onChange={handleChange} required maxLength="35" autoComplete="off" />
+          <input name="name" style={{ textTransform: 'uppercase' }} value={formData.name} onChange={handleChange} required maxLength="35" autoComplete="off" />
         </div>
 
         <div className="dual-row">
@@ -148,7 +148,7 @@ const EditProductView = ({ product, onUpdate, onCancel, CameraScanner }) => {
 
         <div className="form-section promo-toggle-section">
           <div className="promo-label-box">
-             <label>PROMO 2ª UNIDAD -50%</label>
+            <label>PROMO 2ª UNIDAD -50%</label>
           </div>
           <label className="switch">
             <input type="checkbox" name="offer" checked={formData.offer === '1'} onChange={handleChange} />

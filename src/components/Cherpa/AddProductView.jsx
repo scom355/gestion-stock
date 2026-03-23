@@ -32,7 +32,7 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
       if (isMobile && keyboardForced) return;
       const activeEl = document.activeElement;
       const isOtherInputActive = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && activeEl !== barcodeRef.current;
-      
+
       if (!isOtherInputActive && barcodeRef.current && !formData.barcode && !askTicket) {
         barcodeRef.current.focus();
       }
@@ -126,7 +126,7 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
   };
 
   const handleTicketDecision = (wantTicket) => {
-    if (wantTicket) { onBack(true, { product: savedProduct, qty: cantidad }); } 
+    if (wantTicket) { onBack(true, { product: savedProduct, qty: cantidad }); }
     else { onBack(false); }
     resetForm();
   };
@@ -144,8 +144,8 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
           <button type="button" onClick={() => setCantidad(cantidad + 1)}> + </button>
         </div>
         <div className="decision-actions">
-           <button type="button" className="btn-yes" onClick={() => handleTicketDecision(true)}>SI, AÑADIR</button>
-           <button type="button" className="btn-no" onClick={() => handleTicketDecision(false)}>NO, VOLVER</button>
+          <button type="button" className="btn-yes" onClick={() => handleTicketDecision(true)}>SI, AÑADIR</button>
+          <button type="button" className="btn-no" onClick={() => handleTicketDecision(false)}>NO, VOLVER</button>
         </div>
         <style>{`
           .add-success-screen { padding: 40px 20px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; }
@@ -167,11 +167,11 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
     <div className="add-product-view-modern">
       {showCamera && CameraScanner && (
         <div className="camera-overlay-mini">
-           <div className="camera-container-v2">
-              <button type="button" className="camera-top-close-btn" onClick={() => setShowCamera(false)}>✕</button>
-              <CameraScanner onScan={(code) => { setFormData(prev => ({ ...prev, barcode: code })); setShowCamera(false); }} />
-              <button type="button" className="btn-close-cam" onClick={() => setShowCamera(false)}>CERRAR</button>
-           </div>
+          <div className="camera-container-v2">
+            <button type="button" className="camera-top-close-btn" onClick={() => setShowCamera(false)}>✕</button>
+            <CameraScanner onScan={(code) => { setFormData(prev => ({ ...prev, barcode: code })); setShowCamera(false); }} />
+            <button type="button" className="btn-close-cam" onClick={() => setShowCamera(false)}>CERRAR</button>
+          </div>
         </div>
       )}
 
@@ -179,10 +179,10 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
         <div className="form-section">
           <label>CÓDIGO DE BARRAS / EAN</label>
           <div className="input-with-icon">
-            <input ref={barcodeRef} name="barcode" type="text" inputMode="text" value={formData.barcode} onChange={handleChange} placeholder="Escanea o escribe..." required />
+            <input ref={barcodeRef} name="barcode" type="tel" inputMode="numeric" value={formData.barcode} onChange={handleChange} placeholder="Escanea o escribe..." required />
             <div className="input-actions-mini">
-              <div 
-                className={`keyboard-mini-icon ${keyboardForced ? 'active' : ''}`} 
+              <div
+                className={`keyboard-mini-icon ${keyboardForced ? 'active' : ''}`}
                 onClick={() => toggleKeyboard(barcodeRef)}
                 title="Toggle Keyboard"
               >
@@ -238,7 +238,7 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
 
         <div className="form-section promo-toggle-section">
           <div className="promo-label-box">
-             <label>PROMO 2ª UNIDAD -50%</label>
+            <label>PROMO 2ª UNIDAD -50%</label>
           </div>
           <label className="switch">
             <input type="checkbox" name="offer" checked={formData.offer === '1'} onChange={handleChange} />
@@ -273,7 +273,7 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
         .keyboard-mini-icon.active { background: #004691; color: #fff; box-shadow: 0 4px 12px rgba(0, 70, 145, 0.3); }
         .scan-mini-icon { width: 42px !important; height: 42px !important; background: #004691 !important; color: #fff !important; border: none !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0, 70, 145, 0.3) !important; z-index: 10; }
         
-        input:not(.mini-input) { width: 100%; background: #f8fafc; border: 2.5px solid #f1f5f9; border-radius: 12px; padding: 14px 18px; font-size: 16px; font-weight: 800; outline: none; color: #000000; }
+        input:not(.mini-input) { width: 100%; min-width: 0; background: #f8fafc; border: 2.5px solid #f1f5f9; border-radius: 12px; padding: 14px 18px; font-size: 16px; font-weight: 800; outline: none; color: #000000; }
         input:focus { border-color: #004691; }
 
         .dual-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
