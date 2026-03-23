@@ -58,20 +58,19 @@ const CameraScanner = ({ onScan }) => {
           return;
         }
 
+        // Keep constraints simple; aggressive advanced constraints can cause Safari to reject/ignore sizing
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 60 },
-            advanced: [{ focusMode: "continuous" }, { autoFocus: "continuous" }]
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 720, min: 480 }
           }
         });
 
         if (!mounted) return stopScanner();
         if (videoRef.current) videoRef.current.srcObject = stream;
 
-        // Give the camera a tiny moment to auto-focus before banging it with image processing
+        // Give the camera a tiny moment to auto-focus naturally before CPU load
         setTimeout(async () => {
           if (!mounted) return;
           if ('BarcodeDetector' in window) {
@@ -83,7 +82,7 @@ const CameraScanner = ({ onScan }) => {
             let lastDetectionTime = 0;
             const loop = async (time) => {
               if (!mounted || !videoRef.current) return;
-              // Snapping every 15ms makes it crazy fast (approx 60fps check)
+              // Android Native Engine can handle 60fps checks smoothly
               if (time - lastDetectionTime > 15) {
                 if (videoRef.current.readyState >= 2) {
                   try {
@@ -110,20 +109,19 @@ const CameraScanner = ({ onScan }) => {
                   facingMode: "environment",
                   width: { ideal: 1280 },
                   height: { ideal: 720 },
-                  aspectRatio: { min: 1, max: 2 },
-                  advanced: [{ focusMode: 'continuous' }]
+                  aspectRatio: { min: 1, max: 2 }
                 }
               },
               locator: {
-                patchSize: "large", // Larger patches grab bigger chunks, highly reducing focus jitter
-                halfSample: false   // Do not compress sample to improve accuracy
+                patchSize: "medium", // 'medium' is the best sweet spot for EAN on retail products
+                halfSample: true     // CRITICAL FOR iOS! Safari chokes on 720p 60fps full-sample math!
               },
               decoder: {
-                readers: ["ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader", "code_128_reader"]
+                readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader"]
               },
               locate: true,
-              numOfWorkers: Math.max(navigator.hardwareConcurrency || 4, 4),
-              frequency: 60 // Run at maximum possible frequency
+              numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 2, // Safe worker cap for iOS
+              frequency: 15 // 15 checks a sec is completely CPU-safe but very fast perception
             }, (err) => {
               if (err) { setHasError(true); return; }
               if (mounted) { Quagga.start(); quaggaRunning = true; }
@@ -134,8 +132,8 @@ const CameraScanner = ({ onScan }) => {
             Quagga.onDetected((res) => {
               const code = res?.codeResult?.code;
               if (!code) return;
+              // Very strict match on at least 2 hits ensures no false positives but high speed
               if (code === lastCode) { lastCodeCount++; } else { lastCode = code; lastCodeCount = 1; }
-              // Reduced strictly to 2 hits for instant snap similar to official apps
               if (lastCodeCount >= 2) {
                 handleSuccess(code);
                 lastCode = '';
@@ -144,7 +142,7 @@ const CameraScanner = ({ onScan }) => {
             });
           }
           setIsScanning(true);
-        }, 300); // 300ms warmup delay helps autofocus
+        }, 400); // 400ms warmup delay for iOS natural autofocus
       } catch (err) {
         setHasError(true);
         setErrorMsg("Sin acceso a cámara o permiso denegado.");

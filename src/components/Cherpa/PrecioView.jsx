@@ -453,7 +453,7 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
 
       <style>{`
         .precio-viewer-v3 { width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; }
-        .search-sticky-header { width: 100%; padding: 12px 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; background: #fff; z-index: 50; }
+        .search-sticky-header { width: 100%; padding: 10px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f1f5f9; background: #fff; z-index: 50; }
         
         .ticket-mode-badge {
           background: #16A34A; color: #fff; font-size: 10px; font-weight: 950;
@@ -462,21 +462,21 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
         }
         @keyframes pulse-badge { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        .btn-back-mode { background: #f1f5f9; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #64748b; flex-shrink: 0; }
+        .btn-back-mode { background: #f1f5f9; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #64748b; flex-shrink: 0; }
         
         .precio-search-bar { 
-          flex: 1; display: flex; align-items: center; background: #fff; border: 2px solid #e2e8f0; border-radius: 100px; padding: 0 5px 0 20px; height: 60px; gap: 10px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+          flex: 1; display: flex; align-items: center; background: #fff; border: 2px solid #e2e8f0; border-radius: 50px; padding: 0 5px 0 15px; height: 50px; gap: 6px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.03); box-sizing: border-box;
           position: relative;
         }
         .precio-search-bar:focus-within { border-color: #16A34A; box-shadow: 0 4px 20px rgba(22, 163, 74, 0.15); }
-        .precio-search-bar.cam-on { border-color: #EA580C; }
-        .precio-icon-glass { font-size: 20px; opacity: 0.7; pointer-events: none; }
-        .precio-search-bar input { flex: 1; min-width: 0; border: none; background: transparent; padding: 12px 0; font-size: 16px; font-weight: 800; outline: none; color: #000000; }
+        .precio-search-bar.cam-on { border-color: #EA580C; background: #fffaf5; }
+        .precio-icon-glass { font-size: 16px; opacity: 0.7; pointer-events: none; }
+        .precio-search-bar input { flex: 1; min-width: 0; border: none; background: transparent; padding: 10px 0; font-size: 15px; font-weight: 800; outline: none; color: #000000; box-sizing: border-box; }
         
-        .precio-actions-group { display: flex; gap: 6px; align-items: center; }
-        .btn-keyboard-toggle { background: transparent; color: #94a3b8; border: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; transition: 0.2s; }
+        .precio-actions-group { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+        .btn-keyboard-toggle { background: transparent; color: #94a3b8; border: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; transition: 0.2s; font-size: 14px; }
         .btn-keyboard-toggle.active { background: #f1f5f9; color: #16A34A; }
-        .btn-camera { border: none; color: #fff; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: 0.2s; }
+        .btn-camera { border: none; color: #fff; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: 0.2s; font-size: 14px; }
 
         .camera-active-banner { flex: 1; display: flex; justify-content: space-between; align-items: center; font-weight: 950; font-size: 13px; color: #EA580C; letter-spacing: 0.5px; padding: 0 10px; }
         .btn-exit-scan { background: #EA580C; color: #fff; border: none; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: 950; text-transform: uppercase; }

@@ -267,22 +267,22 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
 
       <style>{`
         .consulta-articulo-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; align-items: center; }
-        .search-header { width: 100%; padding: 15px; background: #fff; display: flex; justify-content: center; }
+        .search-header { width: 100%; padding: 10px; background: #fff; display: flex; justify-content: center; box-sizing: border-box; }
         
         .search-bar-premium { 
-          display: flex; align-items: center; background: #f8fafc; padding: 0 15px; border-radius: 100px; gap: 12px; 
-          border: 1px solid #e2e8f0; width: 100%; max-width: 600px; height: 55px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+          display: flex; align-items: center; background: #f8fafc; padding: 0 5px 0 15px; border-radius: 50px; gap: 6px; 
+          border: 1px solid #e2e8f0; width: 100%; max-width: 600px; height: 50px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.02); box-sizing: border-box;
         }
         .search-bar-premium:focus-within { background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: #004691; }
         .search-bar-premium.cam-on { border-color: #E1000F; background: #fef2f2; }
-        .search-icon-glass { font-size: 18px; opacity: 0.5; pointer-events: none; }
-        .search-bar-premium input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 16px; font-weight: 800; color: #000000; height: 100%; }
+        .search-icon-glass { font-size: 16px; opacity: 0.5; pointer-events: none; }
+        .search-bar-premium input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 15px; font-weight: 800; color: #000000; height: 100%; box-sizing: border-box; }
         
-        .search-actions-modern { display: flex; gap: 8px; }
-        .btn-keyboard-toggle { background: #f1f5f9; color: #64748b; border: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; transition: 0.2s; }
+        .search-actions-modern { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+        .btn-keyboard-toggle { background: #f1f5f9; color: #64748b; border: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; transition: 0.2s; }
         .btn-keyboard-toggle.active { background: #004691; color: #fff; box-shadow: 0 4px 12px rgba(0, 70, 145, 0.25); }
-        .btn-cam-trigger { background: #004691; color: #fff; border: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 70, 145, 0.25); transition: 0.2s; }
+        .btn-cam-trigger { background: #004691; color: #fff; border: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 70, 145, 0.25); transition: 0.2s; }
 
         .camera-header-mode { display: flex; flex: 1; justify-content: space-between; align-items: center; font-weight: 950; font-size: 12px; color: #E1000F; }
         .btn-cancel-cam { background: #E1000F; color: #fff; border: none; padding: 6px 15px; border-radius: 20px; font-size: 10px; font-weight: 950; }

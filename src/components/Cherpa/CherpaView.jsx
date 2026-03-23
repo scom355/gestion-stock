@@ -313,13 +313,14 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
         .cherpa-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 15px 8px;
+          row-gap: 20px;
+          column-gap: 5px; /* Kam gap taki screen k andar fit aaye */
           justify-content: center;
           align-content: flex-start;
           width: 100%;
           max-width: 500px;
-          padding: 10px;
-          margin-top: 25px;
+          padding: 10px 15px; /* Added horizontal padding to separate from edges */
+          margin-top: 15px;
           padding-bottom: 110px;
         }
 

@@ -26,8 +26,8 @@ const CherpaCard = ({ icon, label, color, onClick }) => {
           transform: scale(0.9);
         }
         .cherpa-icon-box {
-          width: 75px;
-          height: 75px;
+          width: 68px;
+          height: 68px;
           background: #FFFFFF;
           display: flex;
           align-items: center;
@@ -41,29 +41,28 @@ const CherpaCard = ({ icon, label, color, onClick }) => {
         }
         @media (max-width: 360px) {
           .cherpa-icon-box {
-            width: 65px;
-            height: 65px;
-            border-radius: 18px;
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
           }
           .cherpa-icon-box svg {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
           }
         }
         .cherpa-icon-box svg {
-          width: 36px;
-          height: 36px;
+          width: 32px;
+          height: 32px;
         }
         .cherpa-card-label {
-          font-size: 10px;
-          font-weight: 700;
+          font-size: 9px;
+          font-weight: 800;
           color: #334155;
           text-transform: uppercase;
           text-align: center;
-          white-space: nowrap;
+          white-space: normal;
           width: 100%;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          line-height: 1.2;
         }
       `}</style>
     </button>
