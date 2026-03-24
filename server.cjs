@@ -468,6 +468,29 @@ app.get('/api/spool/download/:filename', (req, res) => {
     res.status(404).send('File not found');
 });
 
+app.get('/api/kiosk/:barcode', async (req, res) => {
+    const id = req.params.barcode;
+    const safeFields = 'barcode, name, sell_price, offer';
+
+    try {
+        if (useMySQL) {
+            const [rows] = await pool.query(`SELECT ${safeFields} FROM products WHERE barcode = ?`, [id]);
+            if (rows.length > 0) return res.json(rows[0]);
+        } else {
+            const db = readJSON();
+            const p = db.products.find(p => p.barcode === id);
+            if (p) {
+                const { barcode, name, sell_price, offer } = p;
+                return res.json({ barcode, name, sell_price, offer });
+            }
+        }
+        res.json({});
+    } catch (e) {
+        console.error('Kiosk API Error:', e.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 app.get('/api/product/:barcode', async (req, res) => {
     const id = req.params.barcode;
     if (useMySQL) {
@@ -884,6 +907,19 @@ app.use(express.static(staticPath));
 if (fs.existsSync(path.join(__dirname, 'public'))) {
     app.use(express.static(path.join(__dirname, 'public')));
 }
+
+// Security: Public Poster Export
+app.post('/api/export-poster', bodyParser.raw({ type: 'application/pdf', limit: '10mb' }), (req, res) => {
+    try {
+        const desktopPath = path.join(process.env.USERPROFILE || '', 'Desktop', 'poster.pdf');
+        fs.writeFileSync(desktopPath, req.body);
+        console.log('✅ Poster PDF saved to Desktop:', desktopPath);
+        res.json({ success: true, path: desktopPath });
+    } catch (e) {
+        console.error('❌ Failed to save PDF to Desktop:', e.message);
+        res.status(500).json({ error: e.message });
+    }
+});
 
 app.get(/(.*)/, (req, res) => {
     // If it's an API call that wasn't caught yet, it's a 404

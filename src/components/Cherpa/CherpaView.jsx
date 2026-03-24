@@ -5,6 +5,8 @@ import PrecioView from './PrecioView';
 import SpoolView from './SpoolView';
 import AddProductView from './AddProductView';
 import BandejaView from './BandejaView';
+import CustomerKiosk from './CustomerKiosk';
+import KioskQRView from './KioskQRView';
 
 import iconScanner from '../../assets/cherpa/consulta articulo.jpeg';
 import iconEditar from '../../assets/cherpa/setting.jpeg';
@@ -20,6 +22,13 @@ import iconStaff from '../../assets/cherpa/staff.jpeg';
 import iconSpool from '../../assets/cherpa/spool.avif';
 import iconReports from '../../assets/cherpa/reports.jpeg';
 import iconBandejas from '../../assets/cherpa/carne_new.webp';
+import iconReposicion from '../../assets/cherpa/reposicion.jpg';
+import iconTareas from '../../assets/cherpa/tareas.jpg';
+import iconLogistica from '../../assets/cherpa/logistica.jpg';
+import iconA from '../../assets/cherpa/a.webp';
+import iconB from '../../assets/cherpa/b.webp';
+import iconC from '../../assets/cherpa/c.avif';
+import iconSyncCloud from '../../assets/cherpa/sync_cloud.webp';
 
 const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, removeFromSpool, ticketSpool, setTicketSpool, onGeneratePDF, onAddProduct, onUpdateProduct, activeSubPage, setActiveSubPage, CameraScanner, API_BASE, ticketHistory = [], inputRef }) => {
   const [predefinedBarcode, setPredefinedBarcode] = useState('');
@@ -81,9 +90,13 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
     },
     {
       id: 'chat',
-      label: 'Chat',
+      label: 'Consulta Digital',
       color: '#0396A6',
-      icon: <img src={iconChat} alt="Chat" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      icon: (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '5px' }}>
+          <img src={iconChat} alt="Chat" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </div>
+      )
     },
     {
       id: 'balance',
@@ -108,6 +121,49 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
       label: 'Reports',
       color: '#F43F5E',
       icon: <img src={iconReports} alt="Reports" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'reposicion',
+      label: 'Reposición',
+      color: '#004691',
+      icon: <img src={iconReposicion} alt="Reposición" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'tareas',
+      label: 'Tareas',
+      color: '#004691',
+      icon: <img src={iconTareas} alt="Tareas" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'logistica',
+      label: 'Entrada Mercancia',
+      color: '#004691',
+      icon: <img src={iconLogistica} alt="Logística" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'vouchers',
+      label: 'Vouchers',
+      color: '#004691',
+      icon: <img src={iconA} alt="Vouchers" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'sync',
+      label: 'Sync',
+      color: '#16A34A',
+      action: () => window.location.reload(),
+      icon: <img src={iconB} alt="Sync" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'promos',
+      label: 'Promos Especiales',
+      color: '#004691',
+      icon: <img src={iconC} alt="Promos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    },
+    {
+      id: 'cloud_sync',
+      label: 'Cloud Sync',
+      color: '#0284c7',
+      icon: <img src={iconSyncCloud} alt="Sync Cloud" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     }
   ];
 
@@ -182,25 +238,13 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
         ))}
       </div>
 
-      {/* --- BOTTOM NAVIGATION BAR --- */}
-      <nav className="cherpa-bottom-nav">
-        <div className="nav-item" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-          </svg>
-          <span>Sync</span>
+      <div className="cherpa-mini-footer">
+        <div className="status-indicator">
+          <span className="blue-dot"></span>
+          <span className="status-text">SERVIDOR CONECTADO</span>
         </div>
-        <div className="nav-item" onClick={() => setActiveSubPage('scanner')}>
-          <div className="nav-center-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7h4M21 7h-4M3 11V7a2 2 0 0 1 2-2h4M15 5h4a2 2 0 0 1 2 2v4M3 17v4a2 2 0 0 0 2 2h4M15 23h4a2 2 0 0 0 2-2v-4M7 12h10"></path></svg>
-          </div>
-        </div>
-        <div className="nav-item" onClick={() => setActiveSubPage('stock')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-          <span>Stock</span>
-        </div>
-      </nav>
+      </div>
+
 
       {/* --- SUB PAGES (MODALS) --- */}
       {activeSubPage && (
@@ -281,7 +325,16 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
                 onBack={() => setActiveSubPage(null)}
               />
             )}
-            {!['scanner', 'editar_producto', 'tickets', 'spool', 'add_product', 'bandejas', 'reports'].includes(activeSubPage) && (
+            {activeSubPage === 'kiosk' && (
+              <CustomerKiosk
+                CameraScanner={CameraScanner}
+                API_BASE={API_BASE}
+              />
+            )}
+            {activeSubPage === 'chat' && (
+              <KioskQRView />
+            )}
+            {!['scanner', 'editar_producto', 'tickets', 'spool', 'add_product', 'bandejas', 'reports', 'kiosk', 'chat'].includes(activeSubPage) && (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <div style={{ fontSize: '50px', marginBottom: '20px' }}>🚀</div>
                 <h2 style={{ color: '#004691', fontWeight: 900 }}>{activeSubPage.toUpperCase()}</h2>
@@ -312,7 +365,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
 
         .cherpa-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           row-gap: 20px;
           column-gap: 5px; /* Kam gap taki screen k andar fit aaye */
           justify-content: center;
@@ -321,7 +374,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
           max-width: 500px;
           padding: 10px 15px; /* Added horizontal padding to separate from edges */
           margin-top: 15px;
-          padding-bottom: 110px;
+          padding-bottom: 50px;
         }
 
         .cherpa-bottom-nav {
@@ -363,6 +416,49 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
           box-shadow: 0 8px 20px rgba(0, 57, 134, 0.3);
           margin-top: -35px;
           border: 4px solid white;
+        }
+
+        .cherpa-mini-footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 25px;
+          background: #16A34A; /* Green */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10002;
+          box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-indicator {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .blue-dot {
+          width: 8px;
+          height: 8px;
+          background: #00BFFF; /* Electric Blue */
+          border-radius: 50%;
+          box-shadow: 0 0 8px #00BFFF;
+          animation: pulse-blue 2s infinite;
+        }
+
+        .status-text {
+          color: white;
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+
+        @keyframes pulse-blue {
+          0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #00BFFF; }
+          50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 12px #00BFFF; }
+          100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #00BFFF; }
         }
 
         .cherpa-sub-page {

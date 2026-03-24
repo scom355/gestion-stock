@@ -13,6 +13,7 @@ import { jsPDF } from "jspdf";
 import html2canvas from 'html2canvas';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import CameraScanner from './components/Shared/CameraScanner';
+import CustomerKiosk from './components/Cherpa/CustomerKiosk';
 import SyncView from './components/Dashboard/SyncView';
 
 import iconScanner from './assets/cherpa/consulta_new.png';
@@ -108,7 +109,11 @@ const highlightText = (text, highlight) => {
 };
 
 function App() {
-  const [view, setView] = useState(window.innerWidth < 1024 ? 'scan' : 'landing') // Mobile opens Cherpa, Desktop opens Landing
+  const [view, setView] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('kiosk') === 'true' || params.get('view') === 'kiosk') return 'kiosk';
+    return window.innerWidth < 1024 ? 'scan' : 'landing';
+  });
   const [showSplash, setShowSplash] = useState(true)
   const [barcode, setBarcode] = useState('')
   const [product, setProduct] = useState(null)
@@ -938,6 +943,11 @@ function App() {
 
   return (
     <div className={`app-container light`}>
+      {view === 'kiosk' && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1000000, background: '#fff' }}>
+          <CustomerKiosk CameraScanner={CameraScanner} API_BASE={API_BASE} />
+        </div>
+      )}
       {/* INACTIVITY DIMMER OVERLAY */}
       {isDimmed && (
         <div className="inactivity-dimmer" style={{
