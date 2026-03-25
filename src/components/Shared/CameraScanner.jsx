@@ -98,7 +98,7 @@ const CameraScanner = ({ onScan }) => {
             };
             scannerLoopRef.current = requestAnimationFrame(loop);
           } else {
-            setActiveEngine("QUAGGA2 SCANNER (iOS COMPATIBLE) 🔍");
+            setActiveEngine("SCANNER PRO (ALTA PRECISIÓN) 🔍");
             const Quagga = (await import('@ericblade/quagga2')).default;
             Quagga.init({
               inputStream: {
@@ -107,21 +107,23 @@ const CameraScanner = ({ onScan }) => {
                 target: videoRef.current,
                 constraints: {
                   facingMode: "environment",
-                  width: { ideal: 1280 },
-                  height: { ideal: 720 },
+                  width: { ideal: 1920, min: 1280 }, // 1080p for high detail
+                  height: { ideal: 1080, min: 720 },
                   aspectRatio: { min: 1, max: 2 }
                 }
               },
               locator: {
-                patchSize: "medium", // 'medium' is the best sweet spot for EAN on retail products
-                halfSample: true     // CRITICAL FOR iOS! Safari chokes on 720p 60fps full-sample math!
+                patchSize: "medium",  // 'medium' is much more robust for rotated/tilted barcodes
+                halfSample: false,    // CRITICAL: Disable halfSample for full-resolution precision (better for tilted codes)
+                boxFromPatches: true  // Improved area detection
               },
               decoder: {
-                readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader"]
+                readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader", "upc_e_reader", "code_39_reader"],
+                multiple: false
               },
               locate: true,
-              numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 2, // Safe worker cap for iOS
-              frequency: 15 // 15 checks a sec is completely CPU-safe but very fast perception
+              numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 4, 
+              frequency: 15 // Lowered frequency slightly for better processing time per frame at 1080p
             }, (err) => {
               if (err) { setHasError(true); return; }
               if (mounted) { Quagga.start(); quaggaRunning = true; }
@@ -142,7 +144,7 @@ const CameraScanner = ({ onScan }) => {
             });
           }
           setIsScanning(true);
-        }, 400); // 400ms warmup delay for iOS natural autofocus
+        }, 300); // 300ms warmup delay (slightly reduced)
       } catch (err) {
         setHasError(true);
         setErrorMsg("Sin acceso a cámara o permiso denegado.");

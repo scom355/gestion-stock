@@ -224,8 +224,6 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
 
   return (
     <div className="cherpa-container">
-
-
       <div className="cherpa-grid">
         {menuItems.map((item) => (
           <CherpaCard
@@ -241,7 +239,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
       <div className="cherpa-mini-footer">
         <div className="status-indicator">
           <span className="blue-dot"></span>
-          <span className="status-text">SERVIDOR CONECTADO</span>
+          <span className="status-text">SERVIDOR CONECTADO | v1.2</span>
         </div>
       </div>
 
@@ -359,22 +357,21 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
           justify-content: flex-start;
           padding-top: 60px;
           z-index: 1000;
+          overflow-y: auto; /* Allow scrolling for long lists of icons */
+          -webkit-overflow-scrolling: touch;
         }
-
-
-
         .cherpa-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          row-gap: 20px;
-          column-gap: 5px; /* Kam gap taki screen k andar fit aaye */
+          gap: 10px;
           justify-content: center;
           align-content: flex-start;
           width: 100%;
-          max-width: 500px;
-          padding: 10px 15px; /* Added horizontal padding to separate from edges */
-          margin-top: 15px;
-          padding-bottom: 50px;
+          max-width: 500px; /* Centered mobile-like width on desktop */
+          margin: 10px auto; /* Centered */
+          padding: 10px 8px;
+          padding-bottom: 120px; /* Increased safe space for last row and footer */
+          flex-grow: 1;
         }
 
         .cherpa-bottom-nav {

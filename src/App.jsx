@@ -634,9 +634,17 @@ function App() {
     // 1. Check if product already exists
     const exists = products.find(p => p.barcode === data.barcode);
     if (exists) {
-      const msg = `⚠️ ERROR: El producto "${exists.name}" ya existe con este código.`;
-      alert(msg);
-      return { success: false, error: msg };
+      if (window.confirm(`⚠️ El producto "${exists.name}" ya existe con este código. ¿Deseas sobreescribirlo con los nuevos datos?`)) {
+        // Use handleQuickUpdate to update the existing record
+        const success = await handleQuickUpdate(exists.id, data);
+        if (success) {
+          if (isEvent) dataOrEvent.target.reset();
+          fetchData();
+          return { success: true, product: { ...data, id: exists.id } };
+        }
+        return { success: false, error: 'Error al actualizar el producto existente.' };
+      }
+      return { success: false, error: 'Duplicate barcode: User cancelled replacement.' };
     }
 
     try {

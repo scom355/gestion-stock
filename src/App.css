@@ -604,8 +604,11 @@ body.dark .app-container::before {
 /* STRATEGIC KPI GRID */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   padding-bottom: 50px;
 }
 
@@ -2867,6 +2870,8 @@ body.dark .app-container::before {
   justify-content: center;
   align-items: stretch;
   flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .landing-card {
