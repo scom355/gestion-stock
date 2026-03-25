@@ -113,9 +113,9 @@ const CameraScanner = ({ onScan }) => {
                 }
               },
               locator: {
-                patchSize: "medium",  // 'medium' is much more robust for rotated/tilted barcodes
-                halfSample: false,    // CRITICAL: Disable halfSample for full-resolution precision (better for tilted codes)
-                boxFromPatches: true  // Improved area detection
+                patchSize: "medium",  // 'medium' is a good balance between speed and rotation
+                halfSample: true,     // RE-ENABLED FOR SPEED: Critical for iOS performance
+                boxFromPatches: true
               },
               decoder: {
                 readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader", "upc_e_reader", "code_39_reader"],
@@ -123,7 +123,7 @@ const CameraScanner = ({ onScan }) => {
               },
               locate: true,
               numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 4, 
-              frequency: 15 // Lowered frequency slightly for better processing time per frame at 1080p
+              frequency: 25 // RESTORED snappy response speed
             }, (err) => {
               if (err) { setHasError(true); return; }
               if (mounted) { Quagga.start(); quaggaRunning = true; }
