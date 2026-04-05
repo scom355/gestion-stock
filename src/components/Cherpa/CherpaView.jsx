@@ -320,6 +320,7 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
                 products={products}
                 addToSpool={addToSpool}
                 onDirectPrint={onGeneratePDF}
+                CameraScanner={CameraScanner}
                 API_BASE={API_BASE}
                 onBack={() => setActiveSubPage(null)}
               />
