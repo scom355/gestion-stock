@@ -140,6 +140,30 @@ async function initDB() {
             await pool.query("ALTER TABLE ticket_spool ADD COLUMN weight DECIMAL(10,3) DEFAULT 0.000");
         } catch (e) { /* ignore if already exists */ }
 
+        // --- NEW: Pedidos Table ---
+        await pool.query(`CREATE TABLE IF NOT EXISTS pedidos (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            customer_name VARCHAR(255) NOT NULL,
+            department VARCHAR(100) DEFAULT 'panaderia',
+            items JSON NOT NULL,
+            total DECIMAL(10, 2) DEFAULT 0.00,
+            status VARCHAR(50) DEFAULT 'pendiente',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        // --- NEW: Department Catalog Table ---
+        await pool.query(`CREATE TABLE IF NOT EXISTS department_catalog (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            department VARCHAR(100) NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            image_url TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        try {
+            await pool.query("ALTER TABLE department_catalog ADD COLUMN image_url TEXT");
+        } catch (e) {}
+
         console.log('✅ All MySQL Tables Ready');
     } catch (err) {
         console.warn('⚠️ FALLBACK: MySQL connection failed. Using JSON backup mode only.');
@@ -247,6 +271,11 @@ app.get('/api/products', async (req, res) => {
                 if (isNumeric) {
                     whereClause = ' WHERE barcode = ?';
                     params = [search];
+                } else if (search.includes('|')) {
+                    const keywords = search.split('|').filter(k => k.trim());
+                    const conditions = keywords.map(() => 'name LIKE ?').join(' OR ');
+                    whereClause = ` WHERE ${conditions}`;
+                    params = keywords.map(k => `%${k.trim()}%`);
                 } else {
                     whereClause = ' WHERE name LIKE ?';
                     params = [`%${search}%`];
@@ -258,7 +287,7 @@ app.get('/api/products', async (req, res) => {
             // Priority: starts with match first
             let orderSql = 'ORDER BY id DESC';
             let finalParams = [...params];
-            if (search && !isNumeric) {
+            if (search && !isNumeric && !search.includes('|')) {
                 orderSql = `ORDER BY (CASE WHEN name LIKE ? THEN 1 ELSE 2 END) ASC, id DESC`;
                 finalParams.push(`${search}%`);
             }
@@ -281,6 +310,13 @@ app.get('/api/products', async (req, res) => {
 
             if (isNumeric) {
                 allProducts = allProducts.filter(p => p.barcode === search);
+            } else if (search.includes('|')) {
+                const keywords = search.split('|').map(k => normalizeStr(k.trim())).filter(k => k);
+                allProducts = allProducts.filter(p => {
+                    if (!p.name) return false;
+                    const normName = normalizeStr(p.name);
+                    return keywords.some(k => normName.includes(k));
+                });
             } else {
                 allProducts = allProducts.filter(p => {
                     if (!p.name) return false;
@@ -336,7 +372,7 @@ app.get('/api/dashboard', async (req, res) => {
             "a2": { "value": totalCount.toString(), "label": "INVENTARIO", "color": "#E1000F" },
             "a3": { "value": "📈", "label": "ANÁLISIS", "color": "#009E49" },
             "a4": { "value": "🔔", "label": "ALERTAS", "color": "#F89406" },
-            "a5": { "value": "📄", "label": "SPOOL", "color": "#9b59b6" },
+            "a5": { "value": "🛍️", "label": "PEDIDOS", "color": "#8e44ad" },
             "a6": { "value": "💶", "label": "VENTAS", "color": "#1abc9c" },
             "a7": { "value": "🛠️", "label": "TOOLS", "color": "#e91e63" },
             "a8": { "value": "📊", "label": "REPORTES", "color": "#d9534f" }
@@ -774,6 +810,70 @@ app.get('/api/parked-sales/:id', async (req, res) => {
     }
 });
 
+// --- DEPARTMENT CATALOG API ---
+const CATALOG_FILE = path.join(__dirname, 'catalog.json');
+const readCatalog = () => {
+    try {
+        if (!fs.existsSync(CATALOG_FILE)) return {};
+        return JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf8') || '{}');
+    } catch (e) { return {}; }
+};
+const writeCatalog = (data) => fs.writeFileSync(CATALOG_FILE, JSON.stringify(data, null, 2));
+
+app.get('/api/catalog/:dept', async (req, res) => {
+    const { dept } = req.params;
+    if (useMySQL) {
+        try {
+            const [rows] = await pool.query('SELECT * FROM department_catalog WHERE department = ? ORDER BY id ASC', [dept]);
+            return res.json(rows);
+        } catch (e) { console.error(e); }
+    }
+    const cat = readCatalog();
+    res.json(cat[dept] || []);
+});
+
+app.post('/api/catalog/:dept', async (req, res) => {
+    const { dept } = req.params;
+    const { name, image_url } = req.body;
+    if (!name) return res.status(400).json({ error: 'Nombre es obligatorio' });
+
+    if (useMySQL) {
+        try {
+            const [result] = await pool.query('INSERT INTO department_catalog (department, name, image_url) VALUES (?, ?, ?)', [dept, name, image_url || '']);
+            return res.json({ success: true, id: result.insertId });
+        } catch (e) { return res.status(500).json({ error: e.message }); }
+    }
+    const cat = readCatalog();
+    if (!cat[dept]) cat[dept] = [];
+    const newItem = { id: Date.now(), department: dept, name, image_url: image_url || '' };
+    cat[dept].push(newItem);
+    writeCatalog(cat);
+    res.json({ success: true, id: newItem.id });
+});
+
+app.delete('/api/catalog/:dept/:id', async (req, res) => {
+    const { dept, id } = req.params;
+    if (useMySQL) {
+        try {
+            // Delete by ID (numeric) or just ID as passed
+            const [result] = await pool.query('DELETE FROM department_catalog WHERE id = ? AND department = ?', [id, dept]);
+            console.log(`🗑️ Deleted from MySQL Catalog: ${dept} ID=${id} | Rows: ${result.affectedRows}`);
+            return res.json({ success: true });
+        } catch (e) { 
+            console.error('❌ Delete error:', e.message);
+            return res.status(500).json({ error: e.message }); 
+        }
+    }
+    const cat = readCatalog();
+    if (cat[dept]) {
+        const initialLen = cat[dept].length;
+        cat[dept] = cat[dept].filter(item => item.id.toString() !== id.toString());
+        console.log(`🗑️ Deleted from JSON Catalog: ${dept} ID=${id} | Before: ${initialLen} After: ${cat[dept].length}`);
+        writeCatalog(cat);
+    }
+    res.json({ success: true });
+});
+
 app.delete('/api/parked-sales/:id', async (req, res) => {
     try {
         if (useMySQL) {
@@ -788,6 +888,67 @@ app.delete('/api/parked-sales/:id', async (req, res) => {
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
+});
+
+// --- PEDIDOS (ORDERS) API ---
+app.get('/api/pedidos', async (req, res) => {
+    try {
+        if (useMySQL) {
+            const [rows] = await pool.query('SELECT * FROM pedidos ORDER BY id DESC');
+            return res.json(rows.map(r => ({ ...r, items: typeof r.items === 'string' ? JSON.parse(r.items) : r.items })));
+        }
+        const db = readJSON();
+        res.json(db.pedidos || []);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/pedidos', async (req, res) => {
+    try {
+        const { customer_name, department, items, total } = req.body;
+        const newPedido = { id: Date.now(), customer_name, department: department || 'panaderia', items, total, status: 'pendiente', created_at: new Date() };
+
+        if (useMySQL) {
+            const [result] = await pool.query('INSERT INTO pedidos (customer_name, department, items, total, status) VALUES (?, ?, ?, ?, ?)',
+                [customer_name, department || 'panaderia', JSON.stringify(items), total, 'pendiente']);
+            newPedido.id = result.insertId;
+        } else {
+            const db = readJSON();
+            if (!db.pedidos) db.pedidos = [];
+            db.pedidos.push(newPedido);
+            writeJSON(db);
+        }
+        res.json({ success: true, pedido: newPedido });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/pedidos/:id', async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (useMySQL) {
+            await pool.query('UPDATE pedidos SET status = ? WHERE id = ?', [status, req.params.id]);
+        } else {
+            const db = readJSON();
+            const idx = db.pedidos.findIndex(p => p.id == req.params.id);
+            if (idx !== -1) {
+                db.pedidos[idx].status = status;
+                writeJSON(db);
+            }
+        }
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/pedidos/:id', async (req, res) => {
+    try {
+        if (useMySQL) {
+            await pool.query('DELETE FROM pedidos WHERE id = ?', [req.params.id]);
+        } else {
+            const db = readJSON();
+            db.pedidos = (db.pedidos || []).filter(p => p.id != req.params.id);
+            writeJSON(db);
+        }
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // --- DEPLOYMENT (SYNC TO LIVE) ---

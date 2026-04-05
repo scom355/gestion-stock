@@ -55,10 +55,10 @@
 }
 
 .carne-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
-    grid-template-rows: repeat(6, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: repeat(10, 1fr) !important;
     column-gap: 2mm !important;
-    row-gap: 3mm !important;
+    row-gap: 2mm !important;
 }
 
 .ticket-cell.carne-cell {
@@ -214,8 +214,8 @@
 }
 
 .ticket-barcode-container svg {
-    height: 22px !important;
-    /* Made smaller vertically to definitely fit the 10mm footer */
+    height: 15px !important;
+    /* Made smaller vertically (minus ~2mm) as requested */
     width: auto !important;
     max-width: 100%;
     display: block;
@@ -301,7 +301,6 @@
 }
 
 .tc-pvp-box {
-    border: 0.6pt solid black;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -337,7 +336,6 @@
 
 .tc-details {
     display: flex;
-    border: 0.6pt solid black;
     margin-bottom: 1.2mm;
 }
 
@@ -346,7 +344,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-right: 0.6pt solid black;
     padding: 1mm 0;
 }
 

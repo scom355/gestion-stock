@@ -5,6 +5,7 @@ import PrecioView from './PrecioView';
 import SpoolView from './SpoolView';
 import AddProductView from './AddProductView';
 import BandejaView from './BandejaView';
+import PedidosView from './PedidosView';
 import CustomerKiosk from './CustomerKiosk';
 import KioskQRView from './KioskQRView';
 
@@ -332,7 +333,10 @@ const CherpaView = ({ onBack, products, addToSpool, clearSpool, updateSpool, rem
             {activeSubPage === 'chat' && (
               <KioskQRView />
             )}
-            {!['scanner', 'editar_producto', 'tickets', 'spool', 'add_product', 'bandejas', 'reports', 'kiosk', 'chat'].includes(activeSubPage) && (
+            {activeSubPage === 'pedidos' && (
+              <PedidosView API_BASE={API_BASE} products={products} />
+            )}
+            {!['scanner', 'editar_producto', 'tickets', 'spool', 'add_product', 'bandejas', 'reports', 'kiosk', 'chat', 'pedidos'].includes(activeSubPage) && (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <div style={{ fontSize: '50px', marginBottom: '20px' }}>🚀</div>
                 <h2 style={{ color: '#004691', fontWeight: 900 }}>{activeSubPage.toUpperCase()}</h2>

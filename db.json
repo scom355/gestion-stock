@@ -3,12 +3,12 @@
     {
       "id": 1774058653808,
       "barcode": "5900130030920",
-      "name": "ASAF KHAN SLAO ",
-      "sell_price": 2.35,
-      "price_buy": 2,
+      "name": "J",
+      "sell_price": "2.35",
+      "price_buy": "2",
       "stock_current": 5,
-      "expiry": "",
-      "offer": 0
+      "expiry": null,
+      "offer": "0"
     },
     {
       "id": 1774053759700,

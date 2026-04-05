@@ -12,6 +12,7 @@ const BandejaView = ({ products, addToSpool, onDirectPrint, API_BASE, onBack }) 
   const [generatedBarcode, setGeneratedBarcode] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [pendingItems, setPendingItems] = useState([]);
+  const [isPrinting, setIsPrinting] = useState(false);
   const weightRef = useRef(null);
   const kiloPriceRef = useRef(null);
 
@@ -29,21 +30,12 @@ const BandejaView = ({ products, addToSpool, onDirectPrint, API_BASE, onBack }) 
     }
   }, [weight, kiloPrice, selectedProduct]);
 
+  // Auto-focus on mount only
   useEffect(() => {
-    const isMobile = window.innerWidth < 1024;
-    if (isMobile) return;
-
-    const keepFocus = () => {
-      // Focus kiloPrice if empty, else weight if empty
-      if (kiloPriceRef.current && !kiloPrice) {
-        kiloPriceRef.current.focus();
-      } else if (weightRef.current && !weight) {
-        weightRef.current.focus();
-      }
-    };
-    const interval = setInterval(keepFocus, 300);
-    return () => clearInterval(interval);
-  }, [kiloPrice, weight]);
+    if (kiloPriceRef.current) {
+      kiloPriceRef.current.focus();
+    }
+  }, []);
 
   const handleProductSearch = (term) => {
     setSearchTerm(term);
@@ -257,15 +249,29 @@ const BandejaView = ({ products, addToSpool, onDirectPrint, API_BASE, onBack }) 
               🗑️ LIMPIAR TODO
             </button>
             <button
-              disabled={pendingItems.length === 0}
+              disabled={pendingItems.length === 0 || isPrinting}
               onClick={async () => {
                 if (pendingItems.length === 0) return;
+                setIsPrinting(true);
                 const filename = `carne-${new Date().toISOString().slice(0, 10)}-${Date.now()}.pdf`;
-                await onDirectPrint({ filename, orientation: 'landscape' }, pendingItems, true);
-                setPendingItems([]);
+                try {
+                  await onDirectPrint({ filename, orientation: 'portrait' }, pendingItems, true);
+                  setPendingItems([]);
+                } catch (e) {
+                  console.error(e);
+                } finally {
+                  setIsPrinting(false);
+                }
               }}
-              style={{ background: pendingItems.length === 0 ? '#94a3b8' : '#16a34a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontWeight: '900', fontSize: '12px', cursor: pendingItems.length === 0 ? 'not-allowed' : 'pointer', boxShadow: '0 4px 10px rgba(22, 163, 74, 0.2)' }}>
-              🖨️ IMPRIMIR PDF ({Math.ceil(pendingItems.length / 30)} {Math.ceil(pendingItems.length / 30) > 1 ? 'PÁGINAS' : 'PÁGINA'})
+              style={{
+                background: pendingItems.length === 0 ? '#94a3b8' : '#16a34a',
+                color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px',
+                fontWeight: '900', fontSize: '12px',
+                cursor: (pendingItems.length === 0 || isPrinting) ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 10px rgba(22, 163, 74, 0.2)',
+                display: 'flex', alignItems: 'center', gap: '5px'
+              }}>
+              {isPrinting ? '⏳ PROCESANDO...' : `🖨️ IMPRIMIR (${Math.ceil(pendingItems.length / 30)} PÁG)`}
             </button>
           </div>
         </div>
@@ -278,44 +284,56 @@ const BandejaView = ({ products, addToSpool, onDirectPrint, API_BASE, onBack }) 
                 PÁGINA {pageIdx + 1}
               </div>
               <div style={{
-                width: '100%', background: '#f8fafc', aspectRatio: '297/210',
-                border: '1px solid #cbd5e1', borderRadius: '8px', padding: '3mm',
+                width: '100%', maxWidth: '210mm', margin: '0 auto', background: '#fff', aspectRatio: '210/297',
+                border: '1px solid #cbd5e1', borderRadius: '2px', padding: '0mm',
                 boxSizing: 'border-box', display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)',
-                gridTemplateRows: 'repeat(6, 1fr)',
-                columnGap: '2mm', rowGap: '3mm',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gridTemplateRows: 'repeat(10, 1fr)',
+                columnGap: '2mm', rowGap: '2mm',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
               }}>
                 {Array.from({ length: 30 }).map((_, i) => {
                   const item = pageItems[i];
                   if (!item) return <div key={i} style={{ border: '1px dashed #cbd5e1', background: '#f8fafc' }} />;
                   return (
                     <div key={i} style={{ display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box', background: '#fff' }}>
-                      <div style={{ padding: '0.5mm', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        {/* Header: PRECIO/PESO */}
-                        <div style={{ display: 'flex', gap: '2px', height: '10mm', marginBottom: '2mm' }}>
-                          <div style={{ flex: 1, border: '0.6pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontSize: '5pt', fontWeight: '800' }}>PRECIO €/kg</span>
-                            <span style={{ fontSize: '9pt', fontWeight: '950' }}>{parseFloat(item.price_kilo || 0).toFixed(2)}</span>
+                      <div style={{ padding: '0.5mm', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        {/* Top Section: Price and Weight - Height 10mm */}
+                        <div style={{ display: 'flex', gap: '1mm', height: '10mm' }}>
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            <span style={{ fontSize: '5.5pt', fontWeight: '400', color: '#666' }}>PRECIO €/kg</span>
+                            <span style={{ fontSize: '10pt', fontWeight: '600', color: '#000' }}>{parseFloat(item.price_kilo || 0).toFixed(2)}</span>
                           </div>
-                          <div style={{ flex: 1, border: '0.6pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontSize: '5pt', fontWeight: '800' }}>PESO (kg)</span>
-                            <span style={{ fontSize: '9pt', fontWeight: '950' }}>{parseFloat(item.weight || 0).toFixed(3)}</span>
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            <span style={{ fontSize: '5.5pt', fontWeight: '400', color: '#666' }}>PESO (kg)</span>
+                            <span style={{ fontSize: '10pt', fontWeight: '600', color: '#000' }}>{parseFloat(item.weight || 0).toFixed(3)}</span>
                           </div>
                         </div>
-                        {/* Bottom: PVP + Barcode (Fixed 15mm section) */}
-                        <div style={{ display: 'flex', height: '15mm', gap: '3px', alignItems: 'center' }}>
-                          {/* Price Box: Fixed 12mm */}
-                          <div style={{ flex: 1, height: '12mm', border: '0.6pt solid black', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0 1px' }}>
-                            <span style={{ fontSize: '8pt', fontWeight: '950' }}>PVP €</span>
-                            <span style={{ fontSize: '24pt', fontWeight: '950', letterSpacing: '-1.5px' }}>
-                              {parseFloat(item.sell_price || 0).toFixed(2).replace('.', ',')}
-                            </span>
+
+                        {/* Bottom Section: PVP and Barcode - Height 16mm */}
+                        <div style={{ display: 'flex', height: '17mm', gap: '1mm', alignItems: 'center', overflow: 'hidden' }}>
+                          <div style={{ width: '16mm', marginLeft: '2mm', height: '15mm', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            <span style={{ fontSize: '6pt', fontWeight: '900', color: '#555', marginBottom: '0.5mm' }}>PVP €</span>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', lineHeight: 1 }}>
+                              <span style={{ fontSize: '20pt', fontWeight: '1000', color: '#000', letterSpacing: '-1px' }}>
+                                {parseFloat(item.sell_price || 0).toFixed(2).split('.')[0]}
+                              </span>
+                              <span style={{ fontSize: '11pt', fontWeight: '1000', color: '#000', marginTop: '1.5px' }}>
+                                ,{parseFloat(item.sell_price || 0).toFixed(2).split('.')[1]}
+                              </span>
+                            </div>
                           </div>
-                          {/* Barcode/EAN Box: Fixed 12mm WITH BORDER (Safe width 1.0 to prevent cutting) */}
-                          <div style={{ flex: 1, height: '12mm', border: '0.6pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', overflow: 'hidden' }}>
-                            <Barcode value={item.barcode || '0000000000000'} width={1.0} height={25} displayValue={false} margin={2} background="transparent" />
-                            <div style={{ fontSize: '6.5pt', fontWeight: '600', marginTop: '-1px' }}>{item.barcode}</div>
+                          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Barcode 
+                              value={item.barcode || '0000000000000'} 
+                              width={1.6} 
+                              height={45} 
+                              displayValue={true} 
+                              fontSize={10}
+                              margin={0} 
+                              format="EAN13"
+                              background="transparent" 
+                            />
                           </div>
                         </div>
                       </div>

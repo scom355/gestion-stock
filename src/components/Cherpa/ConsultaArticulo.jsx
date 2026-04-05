@@ -67,7 +67,7 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
         if (!keyboardForced) inputRef.current.click();
       }
     };
-    const interval = setInterval(keepFocus, 300);
+    const interval = setInterval(keepFocus, 2000);
     setTimeout(keepFocus, 100);
     return () => clearInterval(interval);
   }, [scanMode, result, keyboardForced]);
@@ -96,7 +96,7 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
           }
         } catch (err) { if (err.name !== 'AbortError') console.error("Search error:", err); }
       };
-      const timer = setTimeout(triggerSearch, 100);
+      const timer = setTimeout(triggerSearch, 400); // Increased from 100ms
       return () => { clearTimeout(timer); controller.abort(); };
     } else {
       setFilteredList([]);

@@ -74,7 +74,7 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
-    let finalValue = name === 'name' ? value.toUpperCase() : value;
+    let finalValue = value;
 
     if (name === 'offer') {
       finalValue = checked ? '1' : '0';
@@ -93,7 +93,7 @@ const AddProductView = ({ onSave, onBack, initialBarcode = '', CameraScanner }) 
     setIsSaving(true);
     const dataToSave = {
       barcode: formData.barcode,
-      name: formData.name,
+      name: (formData.name || '').toUpperCase().trim(),
       price_buy: formData.price_buy,
       sell_price: formData.sell_price,
       offer: formData.offer,

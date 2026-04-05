@@ -48,7 +48,7 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
         inputRef.current.focus();
       }
     };
-    const interval = setInterval(keepFocus, 300);
+    const interval = setInterval(keepFocus, 2000);
     return () => clearInterval(interval);
   }, [mode, isEditingPrice, result, scanMode, ticketModal]);
 
@@ -70,7 +70,7 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
           }
         } catch (err) { if (err.name !== 'AbortError') console.error("Search error:", err); }
       };
-      const timer = setTimeout(triggerSearch, 100);
+      const timer = setTimeout(triggerSearch, 400); // Increased from 100ms
       return () => { clearTimeout(timer); controller.abort(); };
     } else {
       setFilteredList([]);

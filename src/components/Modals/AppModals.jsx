@@ -35,8 +35,7 @@ const AppModals = React.memo(({
 
   const handleNameChange = (e, setter) => {
     const { selectionStart, selectionEnd, value } = e.target;
-    const upperValue = value.toUpperCase();
-    setter(upperValue);
+    setter(value);
 
     // Crucial: Restore cursor position after state update
     // We use requestAnimationFrame to ensure it happens after React render cycle if needed,
