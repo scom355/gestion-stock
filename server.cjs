@@ -326,8 +326,15 @@ app.get('/api/products', async (req, res) => {
 
                 if (search) {
                     if (isNumeric) {
-                        whereClause = 'WHERE barcode = ?';
-                        params = [search];
+                        // Exact match for full EAN-13, prefix match for partial barcode
+                        if (search.length >= 13) {
+                            whereClause = 'WHERE barcode = ?';
+                            params = [search];
+                        } else {
+                            whereClause = 'WHERE barcode LIKE ?';
+                            params = [`${search}%`];
+                            orderSql = 'ORDER BY LENGTH(barcode) ASC, barcode ASC';
+                        }
                     } else if (search.includes('|')) {
                         const keywords = search.split('|').filter(k => k.trim());
                         const conditions = keywords.map(() => 'name LIKE ?').join(' OR ');
@@ -367,7 +374,13 @@ app.get('/api/products', async (req, res) => {
             const isNumeric = /^\d+$/.test(search);
 
             if (isNumeric) {
-                allProducts = allProducts.filter(p => p.barcode === search);
+                if (search.length >= 13) {
+                    allProducts = allProducts.filter(p => p.barcode === search);
+                } else {
+                    allProducts = allProducts
+                        .filter(p => p.barcode && p.barcode.startsWith(search))
+                        .sort((a, b) => (a.barcode || '').localeCompare(b.barcode || ''));
+                }
             } else if (search.includes('|')) {
                 const keywords = search.split('|').map(k => normalizeStr(k.trim())).filter(k => k);
                 allProducts = allProducts.filter(p => {

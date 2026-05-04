@@ -63,14 +63,14 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
     if (term.length >= 1) {
       const triggerSearch = async () => {
         try {
-          const response = await fetch(`${API_BASE}/products?search=${encodeURIComponent(term)}&limit=15`, { signal: controller.signal });
+          const response = await fetch(`${API_BASE}/products?search=${encodeURIComponent(term)}&limit=50`, { signal: controller.signal });
           const data = await response.json();
           if (data && data.products) {
-            setFilteredList(data.products.slice(0, 20));
+            setFilteredList(data.products.slice(0, 50));
           }
         } catch (err) { if (err.name !== 'AbortError') console.error("Search error:", err); }
       };
-      const timer = setTimeout(triggerSearch, 400); // Increased from 100ms
+      const timer = setTimeout(triggerSearch, 200);
       return () => { clearTimeout(timer); controller.abort(); };
     } else {
       setFilteredList([]);
