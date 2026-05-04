@@ -83,6 +83,54 @@ const DB_CONFIG = {
 let pool = null;
 let useMySQL = false;
 
+// --- MYSQL RECONNECT + JSON→MYSQL SYNC ---
+let reconnectTimer = null;
+
+function scheduleReconnect() {
+    if (reconnectTimer || useMySQL) return;
+    console.log('🔄 MySQL down — reconnect check every 30s...');
+    reconnectTimer = setInterval(async () => {
+        try {
+            await pool.query('SELECT 1');
+            useMySQL = true;
+            clearInterval(reconnectTimer);
+            reconnectTimer = null;
+            console.log('✅ MySQL Reconnected! Syncing JSON changes → MySQL...');
+            syncJSONToMySQL();
+        } catch (e) { /* still down, keep waiting */ }
+    }, 30000);
+}
+
+async function syncJSONToMySQL() {
+    try {
+        const db = readJSON();
+        let synced = 0;
+
+        for (const p of (db.products || [])) {
+            try {
+                await pool.query(
+                    'INSERT IGNORE INTO products (barcode, name, sell_price, price_buy, stock_current, expiry, offer) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [p.barcode, p.name, p.sell_price || 0, p.price_buy || 0, p.stock_current || 0, p.expiry || '', p.offer || 0]
+                );
+                synced++;
+            } catch (e) { /* skip if duplicate */ }
+        }
+
+        for (const item of (db.ticket_spool || [])) {
+            try {
+                await pool.query(
+                    'INSERT IGNORE INTO ticket_spool (barcode, name, sell_price, qty, is_bandeja, price_kilo, weight) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [item.barcode, item.name, item.sell_price, item.qty || 1, item.is_bandeja ? 1 : 0, item.price_kilo || 0, item.weight || 0]
+                );
+            } catch (e) {}
+        }
+
+        console.log(`✅ JSON → MySQL Sync Complete: ${synced} products merged`);
+    } catch (e) {
+        console.error('❌ JSON → MySQL Sync Error:', e.message);
+    }
+}
+
 async function initDB() {
     try {
         console.log('⏳ Connecting to MySQL (localhost)...');
@@ -140,6 +188,12 @@ async function initDB() {
             await pool.query("ALTER TABLE ticket_spool ADD COLUMN weight DECIMAL(10,3) DEFAULT 0.000");
         } catch (e) { /* ignore if already exists */ }
 
+        // FULLTEXT index for fast product name search
+        try {
+            await pool.query('ALTER TABLE products ADD FULLTEXT INDEX ft_products_name (name)');
+            console.log('✅ FULLTEXT index created on products.name');
+        } catch (e) { /* already exists */ }
+
         // --- NEW: Pedidos Table ---
         await pool.query(`CREATE TABLE IF NOT EXISTS pedidos (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -168,6 +222,7 @@ async function initDB() {
     } catch (err) {
         console.warn('⚠️ FALLBACK: MySQL connection failed. Using JSON backup mode only.');
         useMySQL = false;
+        scheduleReconnect();
     }
 }
 
@@ -263,42 +318,45 @@ app.get('/api/products', async (req, res) => {
 
     try {
         if (useMySQL) {
-            let whereClause = '';
-            let params = [];
-            const isNumeric = /^\d+$/.test(search);
+            try {
+                let whereClause = '';
+                let params = [];
+                let orderSql = 'ORDER BY id DESC';
+                const isNumeric = /^\d+$/.test(search);
 
-            if (search) {
-                if (isNumeric) {
-                    whereClause = ' WHERE barcode = ?';
-                    params = [search];
-                } else if (search.includes('|')) {
-                    const keywords = search.split('|').filter(k => k.trim());
-                    const conditions = keywords.map(() => 'name LIKE ?').join(' OR ');
-                    whereClause = ` WHERE ${conditions}`;
-                    params = keywords.map(k => `%${k.trim()}%`);
-                } else {
-                    whereClause = ' WHERE name LIKE ?';
-                    params = [`%${search}%`];
+                if (search) {
+                    if (isNumeric) {
+                        whereClause = 'WHERE barcode = ?';
+                        params = [search];
+                    } else if (search.includes('|')) {
+                        const keywords = search.split('|').filter(k => k.trim());
+                        const conditions = keywords.map(() => 'name LIKE ?').join(' OR ');
+                        whereClause = `WHERE ${conditions}`;
+                        params = keywords.map(k => `%${k.trim()}%`);
+                    } else {
+                        // FULLTEXT: fast indexed search, supports prefix wildcard (*)
+                        const boolSearch = search.trim().split(/\s+/).filter(w => w).map(w => `${w}*`).join(' ');
+                        whereClause = 'WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)';
+                        params = [boolSearch];
+                        orderSql = ''; // FULLTEXT ranks by relevance automatically
+                    }
                 }
+
+                // SQL_CALC_FOUND_ROWS eliminates the extra COUNT(*) query
+                const [rows] = await pool.query(
+                    `SELECT SQL_CALC_FOUND_ROWS id, barcode, name, price_buy, sell_price, stock_current, expiry, offer FROM products ${whereClause} ${orderSql} LIMIT ? OFFSET ?`,
+                    [...params, limit, offset]
+                );
+                const [[{ total }]] = await pool.query('SELECT FOUND_ROWS() as total');
+
+                console.log(`🔍 [MySQL FULLTEXT] Query: "${search}" | Results: ${rows.length}/${total}`);
+                return res.json({ products: rows, total, page, limit });
+            } catch (e) {
+                console.error('MySQL Products Error:', e.message);
+                useMySQL = false;
+                scheduleReconnect();
+                // fall through to JSON fallback
             }
-
-            const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM products ${whereClause}`, params);
-
-            // Priority: starts with match first
-            let orderSql = 'ORDER BY id DESC';
-            let finalParams = [...params];
-            if (search && !isNumeric && !search.includes('|')) {
-                orderSql = `ORDER BY (CASE WHEN name LIKE ? THEN 1 ELSE 2 END) ASC, id DESC`;
-                finalParams.push(`${search}%`);
-            }
-
-            const [rows] = await pool.query(
-                `SELECT id, barcode, name, price_buy, sell_price, stock_current, expiry, offer FROM products ${whereClause} ${orderSql} LIMIT ? OFFSET ?`,
-                [...finalParams, limit, offset]
-            );
-
-            console.log(`🔍 [MySQL Search] Query: "${search}" | Results: ${rows.length}/${total}`);
-            return res.json({ products: rows, total, page, limit });
         }
 
         const db = readJSON();
