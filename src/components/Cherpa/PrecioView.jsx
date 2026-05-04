@@ -42,15 +42,25 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
   // Focus management: always keep input focused unless camera active or editing price
   useEffect(() => {
     const keepFocus = () => {
-      if (isEditingPrice || isAskingTicket || scanMode === 'camera') return;
-      // We removed "if (ticketModal) return;" so that the user can scan another item instantly
+      if (isEditingPrice || isAskingTicket || scanMode === 'camera' || result === 'not_found') return;
       if (inputRef.current && mode) {
         inputRef.current.focus();
       }
     };
     const interval = setInterval(keepFocus, 2000);
     return () => clearInterval(interval);
-  }, [mode, isEditingPrice, result, scanMode, ticketModal]);
+  }, [mode, isEditingPrice, result, scanMode]);
+
+  // Auto-dismiss "not found" after 2 seconds
+  useEffect(() => {
+    if (result !== 'not_found') return;
+    const timer = setTimeout(() => {
+      setResult(null);
+      setNotFoundBarcode('');
+      if (inputRef.current) inputRef.current.focus();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [result]);
 
   // Live text search (non-barcode)
   useEffect(() => {
@@ -96,18 +106,14 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
     // 1. Immediately add 1 ticket to spool
     addToSpool(product);
 
-    // 2. Show extra qty modal (as a non-blocking toast at the bottom)
-    setTicketModal({ product });
-    setExtraCantidad(1);
-
-    // 3. Reset search bar immediately (ready for next scan)
+    // 2. Reset search bar immediately (ready for next scan)
     setBarcode('');
     setFilteredList([]);
     setResult(null);
     setNotFoundBarcode('');
     setScanMode('manual');
 
-    // 4. Flash success briefly
+    // 3. Flash success briefly
     setShowSyncSuccess(true);
     setTimeout(() => setShowSyncSuccess(false), 800);
   }, [addToSpool, ticketSpool]);
@@ -235,37 +241,6 @@ const PrecioView = ({ products, addToSpool, ticketSpool, onAddProduct, onUpdateP
 
   return (
     <div className="precio-viewer-v3">
-
-      {/* ── TICKET QUANTITY MODAL (NON-BLOCKING OVERLAY) ──────────────── */}
-      {ticketModal && (
-        <div className="ticket-modal-overlay">
-          <div className="ticket-modal-card animate-slideUp">
-            <div className="tmo-header">
-              <div className="tmo-check">✅</div>
-              <div className="tmo-added-label">1 TICKET AÑADIDO</div>
-              <div className="tmo-product-name">{ticketModal.product.name}</div>
-              <div className="tmo-price">€{parseFloat(ticketModal.product.sell_price).toFixed(2)}</div>
-            </div>
-
-            <div className="tmo-body">
-              <div className="tmo-qty-label">¿AÑADIR MÁS TICKETS? (OPCIONAL)</div>
-              <div className="tmo-qty-row">
-                <button className="tmo-qty-btn minus" onClick={() => setExtraCantidad(q => Math.max(1, q - 1))}>－</button>
-                <span className="tmo-qty-num">{extraCantidad}</span>
-                <button className="tmo-qty-btn plus" onClick={() => setExtraCantidad(q => q + 1)}>＋</button>
-              </div>
-              <div className="tmo-actions">
-                <button className="tmo-btn-add" onClick={handleAddExtra}>
-                  ＋ AÑADIR {extraCantidad} MÁS
-                </button>
-                <button className="tmo-btn-close" onClick={closeModal}>
-                  ✔ LISTO
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── STICKY SEARCH HEADER ──────────────────────────────────────────── */}
       <div className="search-sticky-header">

@@ -53,9 +53,8 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
 
   useEffect(() => {
     const keepFocus = () => {
-      if (scanMode === 'camera') return;
-      
-      // If keyboard is forced, only auto-focus on desktop to avoid popping keyboard on mobile
+      if (scanMode === 'camera' || result === 'no_found') return;
+
       const isMobile = window.innerWidth < 1024;
       if (isMobile && keyboardForced) return;
 
@@ -63,7 +62,6 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && activeEl !== inputRef.current) return;
       if (inputRef.current) {
         inputRef.current.focus();
-        // click helps trigger focus in some mobile browsers if inputmode is none
         if (!keyboardForced) inputRef.current.click();
       }
     };
@@ -71,6 +69,17 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
     setTimeout(keepFocus, 100);
     return () => clearInterval(interval);
   }, [scanMode, result, keyboardForced]);
+
+  // Auto-dismiss "not found" after 2 seconds
+  useEffect(() => {
+    if (result !== 'no_found') return;
+    const timer = setTimeout(() => {
+      setResult(null);
+      setFailedTerm('');
+      if (inputRef.current) inputRef.current.focus();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [result]);
 
   useEffect(() => {
     const term = searchTerm.trim();

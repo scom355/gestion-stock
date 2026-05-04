@@ -377,6 +377,8 @@ function App() {
       if (showAddModal || editingProduct || reportProduct || showSpoolModal || showResultModal || view === 'add' || error === 'Producto no encontrado') {
         return;
       }
+      // Sub-pages with their own hardware scanner input — don't steal focus
+      if (['bandejas', 'spool', 'pedidos', 'editar_producto'].includes(cherpaSubPage)) return;
 
       // Removed isMobile block because user wants constant focus even on mobile scanners
       // if (isMobile) return; 
