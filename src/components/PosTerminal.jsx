@@ -79,7 +79,7 @@ const PosTerminal = ({ products, setView, API_BASE, logo, fetchData, formatDurat
                 }
             }
         };
-        const interval = setInterval(keepFocus, 300);
+        const interval = setInterval(keepFocus, 2000);
         return () => clearInterval(interval);
     }, [activeSubMenu]);
 

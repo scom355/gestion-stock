@@ -178,35 +178,51 @@ const SpoolView = ({ ticketSpool, setTicketSpool, onGeneratePDF, onClear, onUpda
 
           <div className="a4-preview-scroll">
             <div className="a4-landscape-mockup-standard">
-              <div className={`a4-sheet-container landscape ${ (ticketSpool[currentPage * 20]?.is_bandeja == 1 || ticketSpool[currentPage * 20]?.isBandeja) ? 'carne-no-margin' : ''}`}>
+              <div className={`a4-sheet-container landscape ${(ticketSpool[currentPage * 20]?.is_bandeja == 1 || ticketSpool[currentPage * 20]?.isBandeja) ? 'carne-no-margin' : ''}`}>
                 <div className="a4-grid-20" style={{ columnGap: '3.78px', rowGap: '7.56px' }}>
                   {ticketSpool.slice(currentPage * 20, (currentPage + 1) * 20).map((item, i) => (
                     <div key={i} className="ticket-cell">
                       {item.is_bandeja == 1 || item.isBandeja ? (
-                        <div className="ticket-carne-layout" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1mm' }}>
-                          {/* Preview 1cm Header: PRECIO left, PESO right */}
-                          <div className="tc-top-row" style={{ display: 'flex', gap: '5px', height: '10mm', marginBottom: '2mm' }}>
-                            <div className="tc-box-small" style={{ flex: 1, border: '1pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <span style={{ fontSize: '5pt', fontWeight: '800' }}>PRECIO €/kg</span>
-                              <span style={{ fontSize: '8pt', fontWeight: '950' }}>{parseFloat(item.price_kilo || 0).toFixed(2)}</span>
+                        <div className="ticket-carne-layout" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0.5mm', boxSizing: 'border-box', justifyContent: 'space-between' }}>
+                          {/* Top Section: Price and Weight - Height 10mm */}
+                          <div className="tc-top-row" style={{ display: 'flex', gap: '1mm', height: '10mm' }}>
+                            <div className="tc-box-small" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <span style={{ fontSize: '5.5pt', fontWeight: '400', color: '#666' }}>PRECIO €/kg</span>
+                              <span style={{ fontSize: '10pt', fontWeight: '600', color: '#000' }}>{parseFloat(item.price_kilo || 0).toFixed(2)}</span>
                             </div>
-                            <div className="tc-box-small" style={{ flex: 1, border: '1pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <span style={{ fontSize: '5pt', fontWeight: '800' }}>PESO (kg)</span>
-                              <span style={{ fontSize: '8pt', fontWeight: '950' }}>{parseFloat(item.weight || 0).toFixed(3)}</span>
+                            <div className="tc-box-small" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <span style={{ fontSize: '5.5pt', fontWeight: '400', color: '#666' }}>PESO (kg)</span>
+                              <span style={{ fontSize: '10pt', fontWeight: '600', color: '#000' }}>{parseFloat(item.weight || 0).toFixed(3)}</span>
                             </div>
                           </div>
 
-                          {/* Bottom split 50/50 Mirror */}
-                          <div style={{ display: 'flex', height: '14mm', gap: '5px', alignItems: 'center' }}>
-                            <div className="tc-big-pvp-box-half" style={{ flex: 1, height: '11mm', border: '1.2pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <span style={{ fontSize: '7pt', fontWeight: '950', lineHeight: 1 }}>PVP €</span>
-                              <span style={{ fontSize: '18pt', fontWeight: '950', letterSpacing: '-0.5px', lineHeight: 1 }}>
-                                {parseFloat(item.sell_price || 0).toFixed(2).replace('.', ',')}
-                              </span>
+                          {/* Bottom Section: PVP and Barcode - Height 17mm */}
+                          <div style={{ display: 'flex', height: '17mm', gap: '1mm', alignItems: 'center', overflow: 'hidden' }}>
+                            {/* Left: Price Box - Widened for 20pt display */}
+                            <div className="tc-big-pvp-box" style={{ width: '16mm', marginLeft: '2mm', height: '15mm', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <span style={{ fontSize: '6pt', fontWeight: '950', color: '#555', marginBottom: '0.5mm' }}>PVP €</span>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', lineHeight: 1 }}>
+                                <span style={{ fontSize: '20pt', fontWeight: '1000', color: '#000', letterSpacing: '-1px' }}>
+                                  {parseFloat(item.sell_price || 0).toFixed(2).split('.')[0]}
+                                </span>
+                                <span style={{ fontSize: '11pt', fontWeight: '1000', color: '#000', marginTop: '1.5px' }}>
+                                  ,{parseFloat(item.sell_price || 0).toFixed(2).split('.')[1]}
+                                </span>
+                              </div>
                             </div>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <Barcode value={generateCarneBarcode(item)} width={0.9} height={20} displayValue={false} margin={0} background="transparent" />
-                              <div style={{ fontSize: '8pt', fontWeight: '400' }}>{generateCarneBarcode(item)}</div>
+
+                            {/* Right: Barcode Area */}
+                            <div style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <Barcode 
+                                value={generateCarneBarcode(item)} 
+                                width={1.2} 
+                                height={25} 
+                                displayValue={true} 
+                                fontSize={8}
+                                margin={0} 
+                                format="EAN13"
+                                background="transparent" 
+                              />
                             </div>
                           </div>
                         </div>

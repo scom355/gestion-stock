@@ -53,9 +53,8 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
 
   useEffect(() => {
     const keepFocus = () => {
-      if (scanMode === 'camera') return;
-      
-      // If keyboard is forced, only auto-focus on desktop to avoid popping keyboard on mobile
+      if (scanMode === 'camera' || result === 'no_found') return;
+
       const isMobile = window.innerWidth < 1024;
       if (isMobile && keyboardForced) return;
 
@@ -63,44 +62,55 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && activeEl !== inputRef.current) return;
       if (inputRef.current) {
         inputRef.current.focus();
-        // click helps trigger focus in some mobile browsers if inputmode is none
         if (!keyboardForced) inputRef.current.click();
       }
     };
-    const interval = setInterval(keepFocus, 300);
+    const interval = setInterval(keepFocus, 2000);
     setTimeout(keepFocus, 100);
     return () => clearInterval(interval);
   }, [scanMode, result, keyboardForced]);
 
+  // Auto-dismiss "not found" after 2 seconds
+  useEffect(() => {
+    if (result !== 'no_found') return;
+    const timer = setTimeout(() => {
+      setResult(null);
+      setFailedTerm('');
+      if (inputRef.current) inputRef.current.focus();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [result]);
+
   useEffect(() => {
     const term = searchTerm.trim();
-    if (!term || /^\d+$/.test(term)) {
+    if (!term) {
       setFilteredList([]);
       return;
     }
+    const isNumeric = /^\d+$/.test(term);
     const controller = new AbortController();
-    if (term.length >= 1) {
-      const triggerSearch = async () => {
-        try {
-          const query = term.toLowerCase();
-          const localMatch = products.filter(p => p.name && p.name.toLowerCase().includes(query)).slice(0, 10);
-          setFilteredList(localMatch);
-          const response = await fetch(`${API_BASE}/products?search=${encodeURIComponent(term)}&limit=20`, { signal: controller.signal });
-          const data = await response.json();
-          if (data && data.products) {
-            setFilteredList(prev => {
-              const existingIds = new Set(prev.map(p => p.id));
-              const serverNew = data.products.filter(p => !existingIds.has(p.id));
-              return [...prev, ...serverNew].slice(0, 30);
-            });
-          }
-        } catch (err) { if (err.name !== 'AbortError') console.error("Search error:", err); }
-      };
-      const timer = setTimeout(triggerSearch, 100);
-      return () => { clearTimeout(timer); controller.abort(); };
-    } else {
-      setFilteredList([]);
-    }
+
+    // Instant local filter shown before server responds
+    const localMatch = isNumeric
+      ? products.filter(p => p.barcode && p.barcode.startsWith(term)).slice(0, 10)
+      : products.filter(p => p.name && p.name.toLowerCase().includes(term.toLowerCase())).slice(0, 10);
+    setFilteredList(localMatch);
+
+    const triggerSearch = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/products?search=${encodeURIComponent(term)}&limit=50`, { signal: controller.signal });
+        const data = await response.json();
+        if (data && data.products) {
+          setFilteredList(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const serverNew = data.products.filter(p => !existingIds.has(p.id));
+            return [...prev, ...serverNew].slice(0, 50);
+          });
+        }
+      } catch (err) { if (err.name !== 'AbortError') console.error("Search error:", err); }
+    };
+    const timer = setTimeout(triggerSearch, 200);
+    return () => { clearTimeout(timer); controller.abort(); };
   }, [searchTerm, products, API_BASE]);
 
   const handleSelectProduct = (product) => {
@@ -113,8 +123,10 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
     if (e) e.preventDefault();
     const finalTerm = (forcedTerm || searchTerm).trim();
     if (!finalTerm) return;
-    const isEAN = /^\d+$/.test(finalTerm);
-    if (isEAN) {
+    const isFullEAN = /^\d{13}$/.test(finalTerm);
+
+    // Only exact 13-digit EAN goes directly to single card view
+    if (isFullEAN) {
       let found = products.find(p => p.barcode === finalTerm);
       if (!found) {
         try {
@@ -129,17 +141,19 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
         setFilteredList([]);
         return;
       }
-    } else {
-      try {
-        const resSearch = await fetch(`${API_BASE}/products?search=${encodeURIComponent(finalTerm)}&limit=100`);
-        const dataSearch = await resSearch.json();
-        if (dataSearch.products && dataSearch.products.length > 0) {
-          setResult(null);
-          setFilteredList(dataSearch.products);
-          return;
-        }
-      } catch (err) { console.error("Global search error:", err); }
     }
+
+    // Everything else: show as list
+    try {
+      const resSearch = await fetch(`${API_BASE}/products?search=${encodeURIComponent(finalTerm)}&limit=50`);
+      const dataSearch = await resSearch.json();
+      if (dataSearch.products && dataSearch.products.length > 0) {
+        setResult(null);
+        setFilteredList(dataSearch.products);
+        return;
+      }
+    } catch (err) { console.error("Global search error:", err); }
+
     setResult('no_found');
     setFailedTerm(finalTerm);
     setSearchTerm('');
@@ -217,7 +231,7 @@ const ConsultaArticulo = React.memo(({ products, onAddProduct, CameraScanner, AP
             <CameraScanner onScan={handleCameraScan} />
           </div>
         )}
-        {!result && filteredList.length > 0 && (
+        {filteredList.length > 0 && (
           <div className="live-results-list animate-pop">
             {filteredList.map(p => (
               <div key={p.id} className="live-result-item" onClick={() => handleSelectProduct(p)}>

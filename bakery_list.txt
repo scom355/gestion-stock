@@ -1,0 +1,402 @@
+[
+  {
+    "id": 1773495884991,
+    "name": "BAR PROTE CARAM CHOCO BRBLL"
+  },
+  {
+    "id": 1773495884933,
+    "name": "BARRA INTEGRAL 100% 250G CRF"
+  },
+  {
+    "id": 1773495884793,
+    "name": "CHOCO NEGRO 82% ALMENDRA VALO"
+  },
+  {
+    "id": 1773495884523,
+    "name": "DONUT GLACE 4 UD 208 G RR"
+  },
+  {
+    "id": 1773495884172,
+    "name": "B. SUSTIT.CHOCO CRF 192 G"
+  },
+  {
+    "id": 1773495883806,
+    "name": "PAN LECHE PEPITAS 280 GRS. 8 U"
+  },
+  {
+    "id": 1773495882955,
+    "name": "PAN TOST.S/S S/AZ.RECONDO 30 R"
+  },
+  {
+    "id": 1773495882310,
+    "name": "DONUT BOMBON 4U/220G"
+  },
+  {
+    "id": 1773495881153,
+    "name": "GALLETA CHOCO FLAKES CUET 520G"
+  },
+  {
+    "id": 1773495880604,
+    "name": "NATILLAS CHOCOLATE CRF 4X 125"
+  },
+  {
+    "id": 1773495880346,
+    "name": "SALSA NAPOLITANA CARREFOUR 300"
+  },
+  {
+    "id": 1773495880322,
+    "name": "BARRA DA CUNHA 250G"
+  },
+  {
+    "id": 1773495879832,
+    "name": "MINI GALLETA CHOCO CRF 160"
+  },
+  {
+    "id": 1773495879297,
+    "name": "CHIP CHOCO ZERO GULLÓN 125G"
+  },
+  {
+    "id": 1773495878172,
+    "name": "PAN RALLADO S/G CRF 200G"
+  },
+  {
+    "id": 1773495877043,
+    "name": "BEB 00% CHOCO PROT.CRF 330ML"
+  },
+  {
+    "id": 1773495876832,
+    "name": "CHOCOLA POLVO TAZA CORONA 250"
+  },
+  {
+    "id": 1773495876704,
+    "name": "PAN FAMILIAR BIMBO 640G"
+  },
+  {
+    "id": 1773495876127,
+    "name": "FLAUTA CREMA DE CHOCOLATE 75G"
+  },
+  {
+    "id": 1773495874631,
+    "name": "PALMERA CHOCOLATE SIN GLUTEN"
+  },
+  {
+    "id": 1773495874067,
+    "name": "CHOCOLATE CRUJIENTE ARROZ 100G"
+  },
+  {
+    "id": 1773495873823,
+    "name": "BARRITAS CHOCOLATE KELLOGG 32"
+  },
+  {
+    "id": 1773495873719,
+    "name": "PAN HOGAZA S/G C/S.CEREAL 250G"
+  },
+  {
+    "id": 1773495872672,
+    "name": "CEREAL CHOCO SPECIAL K 325 G"
+  },
+  {
+    "id": 1773495871453,
+    "name": "C.CHOCOKRISPIES KELLOGGS 420 G"
+  },
+  {
+    "id": 1773495870484,
+    "name": "MIKADO CHOCO LECHE 75G"
+  },
+  {
+    "id": 1773495870273,
+    "name": "PAN MOLDE ARTESANO BIMBO 500G"
+  },
+  {
+    "id": 1773495867928,
+    "name": "GOFRE CHOCOLATE CARREFOUR 6X6"
+  },
+  {
+    "id": 1773495867843,
+    "name": "CER. CHOCO CURLZ CRF KIDS 500G"
+  },
+  {
+    "id": 1773495866698,
+    "name": "PAN DE GAMBA CARREFOUR"
+  },
+  {
+    "id": 1773495865244,
+    "name": "BOMBON CHOCO BLANCO CORNET 2"
+  },
+  {
+    "id": 1773495861344,
+    "name": "GA.DIGESTIVE CHOCO ZERO"
+  },
+  {
+    "id": 1773495860351,
+    "name": "PAN LECHE 280 GRS 8 UNDES."
+  },
+  {
+    "id": 1773495859076,
+    "name": "PAN INTEGRAL NAT 100% BIMBO450"
+  },
+  {
+    "id": 1773495858509,
+    "name": "HOGAZA CEREALES BIMBO 400 GR"
+  },
+  {
+    "id": 1773495857160,
+    "name": "CROISSA. REL.CREMA CACAOCRF360"
+  },
+  {
+    "id": 1773495855511,
+    "name": "PAN TOSTADO INTEGRAL 36R ORTIZ"
+  },
+  {
+    "id": 1773495855236,
+    "name": "DONUTS BOMBON 2 UDS"
+  },
+  {
+    "id": 1773495854255,
+    "name": "PAN MOLDE C/CEREALES S/G 300G"
+  },
+  {
+    "id": 1773495852974,
+    "name": "PAN MOLDE CLAS.S/G SCHAR 300G"
+  },
+  {
+    "id": 1773495852658,
+    "name": "CHOCOLATINA TWIX SINGLE 50 GR"
+  },
+  {
+    "id": 1773495852517,
+    "name": "CROISSANT CACAO NEVADO 250G"
+  },
+  {
+    "id": 1773495851267,
+    "name": "CHOCOBOLLO CARREFOUR 6U 240G"
+  },
+  {
+    "id": 1773495850755,
+    "name": "FILIPINOS CHOCO NEGRO 128G"
+  },
+  {
+    "id": 1773495850246,
+    "name": "QUAKER CRUESLI CHOCO 375 GR"
+  },
+  {
+    "id": 1773495850090,
+    "name": "PAN MOLDE INTEG.S/C BIMBO 450G"
+  },
+  {
+    "id": 1773495849915,
+    "name": "BARRA RIZADA DA CUNHA 300G"
+  },
+  {
+    "id": 1773495848496,
+    "name": "FILIPINOS CHOCOBLANCO 128G"
+  },
+  {
+    "id": 1773495848191,
+    "name": "COPA DANONE CHOCOLATE/NATA P"
+  },
+  {
+    "id": 1773495848096,
+    "name": "YOGUR CHOCOLAT.ÑAM KAIKU 500M"
+  },
+  {
+    "id": 1773495847958,
+    "name": "NATILLA CHOCOLAT.VALIO PROTEIN"
+  },
+  {
+    "id": 1773495847410,
+    "name": "BAR PROTE CHOCO ALM BRBLL"
+  },
+  {
+    "id": 1773495846890,
+    "name": "GALLETA CHOCOWAFER MILKA 150G"
+  },
+  {
+    "id": 1773495846178,
+    "name": "BARRA RUSTICA 250G"
+  },
+  {
+    "id": 1773495845461,
+    "name": "PAN TOSTADO S/GL SCHAR 260GR"
+  },
+  {
+    "id": 1773495845112,
+    "name": "CHOCOLATE WHITE DUBAI 70G"
+  },
+  {
+    "id": 1773495842434,
+    "name": "GALL NAPOLITANA CUETARA 426 G"
+  },
+  {
+    "id": 1773495841982,
+    "name": "PAN TOST C/S ORTIZ 36 REB"
+  },
+  {
+    "id": 1773495841715,
+    "name": "BARRA ALDEANA"
+  },
+  {
+    "id": 1773495841114,
+    "name": "NAPOLITANA RELL CREMA CRF 320G"
+  },
+  {
+    "id": 1773495841058,
+    "name": "CHOCOLATE DUBAI DELICADORE 98G"
+  },
+  {
+    "id": 1773495837052,
+    "name": "PAN HOGAZA S/G CRF 390 G"
+  },
+  {
+    "id": 1773495836956,
+    "name": "NAPOLITANA CHO. CARREFOUR 320"
+  },
+  {
+    "id": 1773495836847,
+    "name": "PAN NATURAL 100 % SIN CORTEZA"
+  },
+  {
+    "id": 1773495835721,
+    "name": "CHOCO LECHE LINDT TABLETA 100G"
+  },
+  {
+    "id": 1773495833110,
+    "name": "CROISSANTS CLASICOS CRF 350GRS"
+  },
+  {
+    "id": 1773495831682,
+    "name": "CHOCOLATE MILKA OREO 100 GRS"
+  },
+  {
+    "id": 1773495831104,
+    "name": "HEL BELGIAN CHOCO H.DAZS 400G"
+  },
+  {
+    "id": 1773495830784,
+    "name": "PAN PIPAS CARREFOUR 2X83 G"
+  },
+  {
+    "id": 1773495830420,
+    "name": "SIROPE CHOCOLATE CARREFOUR275"
+  },
+  {
+    "id": 1773495829622,
+    "name": "COPA NATA CHOCOLATE CRF 200G"
+  },
+  {
+    "id": 1773495828324,
+    "name": "MUFFINS CHOCO S/G CRF 2 UDS"
+  },
+  {
+    "id": 1773495828093,
+    "name": "PAN HOT DOG CARREFOUR X6 330G"
+  },
+  {
+    "id": 1773495827039,
+    "name": "CHOCOLATE POSTRES NESTLE 200G"
+  },
+  {
+    "id": 1773495823853,
+    "name": "PALMERA CHOCO GRANDE 320G"
+  },
+  {
+    "id": 1773495822961,
+    "name": "TORTITA ARROZ INT.CHOCO CRF130"
+  },
+  {
+    "id": 1773495822659,
+    "name": "PAN DE LECHE PASQUIER 8 UDS"
+  },
+  {
+    "id": 1773495822502,
+    "name": "BARRITA BIG CHOCOLATE CORNY"
+  },
+  {
+    "id": 1773495822441,
+    "name": "PAN CANDEAL ROMBOS 320 G"
+  },
+  {
+    "id": 1773495822323,
+    "name": "CHOCO-SWING GALLETA MILKA 300G"
+  },
+  {
+    "id": 1773495820334,
+    "name": "BAR.PROT.CHOCO JUST LOADING35G"
+  },
+  {
+    "id": 1773495820089,
+    "name": "CHOCOLATINA MARS 51 GRS."
+  },
+  {
+    "id": 1773495819676,
+    "name": "CHOCO C/LECHE LINDOR 100 GRS"
+  },
+  {
+    "id": 1773495818204,
+    "name": "BARRA GRANDE"
+  },
+  {
+    "id": 1773495817303,
+    "name": "SALSA COCKTAIL YBARRA 450 GRS"
+  },
+  {
+    "id": 1773495816535,
+    "name": "DONUTS AMERICAN 2U/156G"
+  },
+  {
+    "id": 1773495815599,
+    "name": "GALL CHOCOBI LECHE MILKA 150GR"
+  },
+  {
+    "id": 1773495815210,
+    "name": "GOTAS DE CHOCOLATE NEGRO CRF"
+  },
+  {
+    "id": 1773495814091,
+    "name": "NAPOLITANA CREMA 95 GR"
+  },
+  {
+    "id": 1773495813587,
+    "name": "CROISSANT VIRUTA CACAO 250G"
+  },
+  {
+    "id": 1773495813047,
+    "name": "CROISSANT CACAO CON MANTEQ 90G"
+  },
+  {
+    "id": 1773495811881,
+    "name": "CROISSANT PLUS RECTO MANTEQUIL"
+  },
+  {
+    "id": 1773495808819,
+    "name": "BAGUETTE SIN GLUTEN SCHAR 350G"
+  },
+  {
+    "id": 1773495808794,
+    "name": "NAPOLITANA CHOCOLATE 95 GR"
+  },
+  {
+    "id": 1773495808173,
+    "name": "PAN MOLDE C/CORT 0%AZ CRF460"
+  },
+  {
+    "id": 1773495808045,
+    "name": "PAN RÚSTICO BLANCO CARREFOUR"
+  },
+  {
+    "id": 1773495806018,
+    "name": "PAN MOLDE TOSTADA 0%AZ CRF820"
+  },
+  {
+    "id": 1773495804418,
+    "name": "PAN RALLADO CRF 750G"
+  },
+  {
+    "id": 1773495804166,
+    "name": "CER. CHOCO FORM NEGRO CRF500"
+  },
+  {
+    "id": 1773495803219,
+    "name": "GALL.MEGA RELL/CHOCO CRF 500GR"
+  }
+]

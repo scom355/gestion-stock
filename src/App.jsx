@@ -15,6 +15,7 @@ import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import CameraScanner from './components/Shared/CameraScanner';
 import CustomerKiosk from './components/Cherpa/CustomerKiosk';
 import SyncView from './components/Dashboard/SyncView';
+import PedidosManager from './components/BackOffice/PedidosManager';
 
 import iconScanner from './assets/cherpa/consulta_new.png';
 import iconPrecio from './assets/cherpa/precio.webp';
@@ -40,7 +41,7 @@ const DEFAULT_DASHBOARD = {
     "a2": { "value": "...", "label": "INVENTARIO v2.2", "color": "#E1000F" },
     "a3": { "value": "...", "label": "ANÁLISIS", "color": "#009E49" },
     "a4": { "value": "...", "label": "ALERTAS", "color": "#F89406" },
-    "a5": { "value": "ADMIN", "label": "AJUSTES", "color": "#334155" },
+    "a5": { "value": "...", "label": "PEDIDOS", "color": "#8e44ad" },
     "a6": { "value": "...", "label": "VENTAS", "color": "#1abc9c" },
     "a7": { "value": "...", "label": "ACCIONES", "color": "#e91e63" },
     "a8": { "value": "...", "label": "INFORMES", "color": "#d9534f" },
@@ -61,8 +62,12 @@ const DashboardIcons = {
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
     </svg>
   ),
-  a5: () => <img src={iconSpool} alt="Ajustes" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />,
-  a6: () => <img src={iconPedidos} alt="Ventas" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />,
+  a5: () => <img src={iconPedidos} alt="Pedidos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />,
+  a6: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mono-icon">
+      <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+  ),
   a7: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mono-icon">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -155,6 +160,8 @@ function App() {
   const [productSearch, setProductSearch] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isDimmed, setIsDimmed] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState('');
   const wakeLockRef = useRef(null);
   const inactivityTimerRef = useRef(null);
 
@@ -264,7 +271,7 @@ function App() {
         fetchData();
       };
 
-      const timer = setTimeout(triggerSearch, 150);
+      const timer = setTimeout(triggerSearch, 500); // Increased from 150ms to 500ms for better scanner buffer
       return () => clearTimeout(timer);
     }
   }, [productSearch, currentProductPage]);
@@ -308,14 +315,20 @@ function App() {
       setLoading(true);
       const searchParam = productSearch ? `&search=${encodeURIComponent(productSearch)}` : '';
       const endpoints = [
-        `${API_BASE}/products?page=${currentProductPage}&limit=50${searchParam}`,
-        `${API_BASE}/categories`,
-        `${API_BASE}/dashboard`,
-        `${API_BASE}/sales`,
-        `${API_BASE}/reports/summary`,
-        `${API_BASE}/spool`,
-        `${API_BASE}/spool/history`
+        `${API_BASE}/products?page=${currentProductPage}&limit=50${searchParam}`
       ];
+
+      // Only fetch other metadata if not in a rapid search/scan
+      if (!productSearch) {
+        endpoints.push(
+          `${API_BASE}/categories`,
+          `${API_BASE}/dashboard`,
+          `${API_BASE}/sales`,
+          `${API_BASE}/reports/summary`,
+          `${API_BASE}/spool`,
+          `${API_BASE}/spool/history`
+        );
+      }
 
       const responses = await Promise.all(endpoints.map(url =>
         fetch(url).catch(e => ({ ok: false, json: () => null }))
@@ -364,6 +377,8 @@ function App() {
       if (showAddModal || editingProduct || reportProduct || showSpoolModal || showResultModal || view === 'add' || error === 'Producto no encontrado') {
         return;
       }
+      // Sub-pages with their own hardware scanner input — don't steal focus
+      if (['bandejas', 'spool', 'pedidos', 'editar_producto'].includes(cherpaSubPage)) return;
 
       // Removed isMobile block because user wants constant focus even on mobile scanners
       // if (isMobile) return; 
@@ -385,7 +400,7 @@ function App() {
     };
 
     // On mobile, we DON'T run the interval to allow normal OS keyboard and scrolling behavior
-    let interval = setInterval(keepFocus, 3000);
+    let interval = setInterval(keepFocus, 2000); // Slowed down from 1s/3s to be less intrusive
 
     const handleWindowTouchOrClick = (e) => {
       const target = e.target;
@@ -580,7 +595,7 @@ function App() {
     const formData = new FormData(e.target);
     const data = {
       barcode: formData.get('barcode'),
-      name: formData.get('name'),
+      name: (formData.get('name') || '').toUpperCase().trim(),
       price_buy: formData.get('price_buy'),
       sell_price: formData.get('price_sell'),
       offer: formData.get('offer') || '0',
@@ -620,7 +635,7 @@ function App() {
       const formData = new FormData(form);
       data = {
         barcode: formData.get('barcode'),
-        name: formData.get('name'),
+        name: (formData.get('name') || '').toUpperCase().trim(),
         price_buy: formData.get('price_buy'),
         sell_price: formData.get('price_sell'),
         offer: formData.get('offer') || 0,
@@ -755,6 +770,9 @@ function App() {
     const ITEMS_PER_PAGE = (hasCarne && !hasProducts) ? 30 : 20;
     const numPages = Math.ceil(activeSpool.length / ITEMS_PER_PAGE);
 
+    setIsGeneratingPDF(true);
+    setPdfStatus('PREPARANDO MOTOR DE IMPRESIÓN...');
+
     try {
       const pdf = new jsPDF({
         orientation: orientation,
@@ -768,6 +786,7 @@ function App() {
       const pageHeight = orientation === 'portrait' ? 297 : 210;
 
       for (let p = 0; p < numPages; p++) {
+        setPdfStatus(`GENERANDO PÁGINA ${p + 1} DE ${numPages}...`);
         if (btn) btn.textContent = `⏳ GENERANDO PÁG ${p + 1}/${numPages}...`;
 
         setTicketSpoolPage(p);
@@ -825,6 +844,7 @@ function App() {
       const pdfBase64 = pdf.output('datauristring');
 
       // 2. ARCHIVE TO SERVER (So it's saved with date/time)
+      setPdfStatus('ARCHIVANDO COPIA DE SEGURIDAD...');
       if (btn) btn.textContent = '📦 ARCHIVANDO...';
       try {
         await fetch(`${API_BASE}/spool/archive`, {
@@ -838,6 +858,7 @@ function App() {
       } catch (e) { console.error("Archive error:", e); }
 
       // 3. SILENT EMAIL (Background)
+      setPdfStatus('SINCRONIZANDO CON LA NUBE...');
       if (btn) btn.textContent = '📨 SINCRONIZANDO...';
       try {
         await fetch(`${API_BASE}/send-email`, {
@@ -861,10 +882,14 @@ function App() {
       }
       setTicketSpoolPage(0);
       setPrintingSpool(null);
+      setIsGeneratingPDF(false);
+      setPdfStatus('');
       if (btn) btn.textContent = originalText;
 
     } catch (err) {
       console.error('PDF Catch:', err);
+      setIsGeneratingPDF(false);
+      setPdfStatus('');
       if (btn) btn.textContent = originalText;
       setPrintingSpool(null);
       alert("❌ ERROR CRÍTICO al generar PDF: " + err.message);
@@ -964,6 +989,45 @@ function App() {
           transition: 'opacity 2s ease-in-out'
         }} />
       )}
+
+      {/* ⏳ PDF GENERATION OVERLAY ⏳ */}
+      {isGeneratingPDF && (
+        <div className="pdf-generation-overlay" style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2000000, transition: 'all 0.5s ease'
+        }}>
+          <div className="loader-container" style={{ position: 'relative', width: '120px', height: '120px', marginBottom: '30px' }}>
+            <div className="spinner-outer" style={{
+              width: '100%', height: '100%', border: '10px solid #f1f5f9',
+              borderTop: '10px solid #004691', borderRadius: '50%',
+              animation: 'spin 1.5s linear infinite'
+            }}></div>
+            <div style={{
+              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+              fontSize: '40px'
+            }}>📄</div>
+          </div>
+          <h2 style={{ color: '#004691', fontWeight: 950, letterSpacing: '-0.5px', marginBottom: '10px', fontSize: '24px' }}>
+            GENERANDO DOCUMENTO
+          </h2>
+          <div style={{
+            background: '#004691', color: 'white', padding: '12px 30px',
+            borderRadius: '50px', fontSize: '14px', fontWeight: 900,
+            boxShadow: '0 10px 20px rgba(0,70,145,0.2)',
+            animation: 'pulse 1.5s infinite'
+          }}>
+            {pdfStatus}
+          </div>
+
+          <style>{`
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            @keyframes pulse { 0% { opacity: 0.8; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.8; transform: scale(0.98); } }
+          `}</style>
+        </div>
+      )}
+
       {/* ⚪ CHERPA BLANK OVERRIDE ⚪ */}
       <div id="pdf-hidden-generator" style={{ position: 'fixed', top: '-5000px', left: '-5000px', pointerEvents: 'none' }}>
         <div id="a4-canvas" className={`a4-sheet-container ${ticketOrientation} ${(printingSpool || ticketSpool).every(i => i?.is_bandeja == 1 || i?.isBandeja) ? 'carne-no-margin' : ''}`}>
@@ -978,32 +1042,46 @@ function App() {
                   {item ? (
                     <>
                       {item.is_bandeja == 1 || item.isBandeja ? (
-                        <div className="ticket-carne-layout" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0.4mm', boxSizing: 'border-box' }}>
-                          {/* Top Section: Compact 9mm instead of 10mm */}
-                          <div className="tc-top-row" style={{ display: 'flex', gap: '2px', height: '9mm', marginBottom: '1mm' }}>
-                            <div className="tc-box-small" style={{ flex: 1, border: '0.45pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <span style={{ fontSize: '4.5pt', fontWeight: '800' }}>PRECIO €/kg</span>
-                              <span style={{ fontSize: '8.5pt', fontWeight: '950' }}>{parseFloat(item.price_kilo || 0).toFixed(2)}</span>
+                        <div className="ticket-carne-layout" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0.5mm', boxSizing: 'border-box', justifyContent: 'space-between' }}>
+                          {/* Top Section: Price and Weight - Height 10mm */}
+                          <div className="tc-top-row" style={{ display: 'flex', gap: '1mm', height: '10mm' }}>
+                            <div className="tc-box-small" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <span style={{ fontSize: '5.5pt', fontWeight: '400', color: '#666' }}>PRECIO €/kg</span>
+                              <span style={{ fontSize: '10pt', fontWeight: '600', color: '#000' }}>{parseFloat(item.price_kilo || 0).toFixed(2)}</span>
                             </div>
-                            <div className="tc-box-small" style={{ flex: 1, border: '0.45pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <span style={{ fontSize: '4.5pt', fontWeight: '800' }}>PESO (kg)</span>
-                              <span style={{ fontSize: '8.5pt', fontWeight: '950' }}>{parseFloat(item.weight || 0).toFixed(3)}</span>
+                            <div className="tc-box-small" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <span style={{ fontSize: '5.5pt', fontWeight: '400', color: '#666' }}>PESO (kg)</span>
+                              <span style={{ fontSize: '10pt', fontWeight: '600', color: '#000' }}>{parseFloat(item.weight || 0).toFixed(3)}</span>
                             </div>
                           </div>
 
-                          {/* Bottom Section: Compact 14mm */}
-                          <div style={{ display: 'flex', height: '14mm', gap: '3px', alignItems: 'center' }}>
-                            {/* Left: Price Box - 11mm instead of 12mm */}
-                            <div className="tc-big-pvp-box" style={{ flex: 1.1, height: '11mm', border: '0.45pt solid black', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0 1px' }}>
-                              <span style={{ fontSize: '7pt', fontWeight: '950' }}>PVP €</span>
-                              <span style={{ fontSize: '22pt', fontWeight: '950', letterSpacing: '-1.5px' }}>
-                                {parseFloat(item.sell_price || 0).toFixed(2).replace('.', ',')}
-                              </span>
+                          {/* Bottom Section: PVP and Barcode - Height 17mm */}
+                          <div style={{ display: 'flex', height: '17mm', gap: '1mm', alignItems: 'center', overflow: 'hidden' }}>
+                            {/* Left: Price Box - Widened for 20pt display */}
+                            <div className="tc-big-pvp-box" style={{ width: '16mm', marginLeft: '2mm', height: '15mm', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <span style={{ fontSize: '6pt', fontWeight: '950', color: '#555', marginBottom: '0.5mm' }}>PVP €</span>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', lineHeight: 1 }}>
+                                <span style={{ fontSize: '20pt', fontWeight: '1000', color: '#000', letterSpacing: '-1px' }}>
+                                  {parseFloat(item.sell_price || 0).toFixed(2).split('.')[0]}
+                                </span>
+                                <span style={{ fontSize: '11pt', fontWeight: '1000', color: '#000', marginTop: '1.5px' }}>
+                                  ,{parseFloat(item.sell_price || 0).toFixed(2).split('.')[1]}
+                                </span>
+                              </div>
                             </div>
-                            {/* Right: Barcode Area - 11mm */}
-                            <div style={{ flex: 1, height: '11mm', border: '0.45pt solid black', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', boxSizing: 'border-box', overflow: 'hidden', paddingLeft: '2.5mm' }}>
-                              <Barcode value={generateCarneBarcode(item)} width={1.45} height={26} displayValue={false} margin={2} background="transparent" />
-                              <div style={{ fontSize: '8pt', fontWeight: '400', marginTop: '-1px', width: '100%', textAlign: 'center', paddingRight: '2.5mm' }}>{generateCarneBarcode(item)}</div>
+
+                            {/* Right: Barcode Area */}
+                            <div style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              <Barcode 
+                                value={generateCarneBarcode(item)} 
+                                width={1.65} 
+                                height={45} 
+                                displayValue={true} 
+                                fontSize={9}
+                                margin={0} 
+                                format="EAN13"
+                                background="transparent" 
+                              />
                             </div>
                           </div>
                         </div>
@@ -1225,7 +1303,7 @@ function App() {
                             {selectedKpi === 'a2' && 'Inventario'}
                             {selectedKpi === 'a3' && 'Análisis'}
                             {selectedKpi === 'a4' && 'Alertas'}
-                            {selectedKpi === 'a5' && 'Ajustes App'}
+                            {selectedKpi === 'a5' && 'Pedidos'}
                             {selectedKpi === 'a6' && 'Ventas'}
                             {selectedKpi === 'a7' && 'Acciones'}
                             {selectedKpi === 'a8' && 'Reportes'}
@@ -1233,28 +1311,47 @@ function App() {
                           </div>
                         </div>
 
-                        {/* === SETTINGS NAVIGATION SUB-SECTIONS === */}
                         {selectedKpi === 'a5' && (
-                          <div className="sidebar-sections" style={{ padding: '15px' }}>
-                            <div style={{ background: 'rgba(51, 65, 85, 0.05)', padding: '20px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                              <div style={{ fontSize: '30px', marginBottom: '10px' }}>⚙️</div>
-                              <h4 style={{ fontSize: '12px', fontWeight: '900', color: '#1e293b' }}>CONFIGURACIÓN</h4>
-                              <p style={{ fontSize: '10px', color: '#64748b', marginTop: '5px' }}>Opciones disponibles en la próxima versión.</p>
+                          <div className="sidebar-sections" style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <div className="sidebar-section-title">DEPARTAMENTOS</div>
+
+                            <div className="dept-sidebar-btn animate-pop" style={{ borderLeft: '4px solid #f59e0b' }}>
+                              <span className="dept-icon-mini">🥐</span>
+                              <div className="dept-info-mini">
+                                <span className="dept-label-mini">PANADERÍA</span>
+                                <span className="dept-status-mini">ACTIVO</span>
+                              </div>
+                            </div>
+
+                            <div className="dept-sidebar-btn animate-pop" style={{ borderLeft: '4px solid #ef4444' }}>
+                              <span className="dept-icon-mini">🍎</span>
+                              <div className="dept-info-mini">
+                                <span className="dept-label-mini">FRUTERÍA</span>
+                                <span className="dept-status-mini">ACTIVO</span>
+                              </div>
+                            </div>
+
+                            <div className="dept-sidebar-btn animate-pop" style={{ borderLeft: '4px solid #3b82f6' }}>
+                              <span className="dept-icon-mini">❄️</span>
+                              <div className="dept-info-mini">
+                                <span className="dept-label-mini">CONGELADOS</span>
+                                <span className="dept-status-mini">ACTIVO</span>
+                              </div>
+                            </div>
+
+                            <div className="dept-sidebar-btn animate-pop" style={{ borderLeft: '4px solid #65a30d' }}>
+                              <span className="dept-icon-mini">📦</span>
+                              <div className="dept-info-mini">
+                                <span className="dept-label-mini">ALIMENTACIÓN</span>
+                                <span className="dept-status-mini">ACTIVO</span>
+                              </div>
                             </div>
                           </div>
                         )}
-
-                        {selectedKpi === 'a5' ? (
-                          <div className="sidebar-sections" style={{ padding: '15px' }}>
-                            <div style={{ background: 'rgba(51, 65, 85, 0.05)', padding: '20px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                              <div style={{ fontSize: '30px', marginBottom: '10px' }}>⚙️</div>
-                              <h4 style={{ fontSize: '12px', fontWeight: '900', color: '#1e293b' }}>CONFIGURACIÓN</h4>
-                              <p style={{ fontSize: '10px', color: '#64748b', marginTop: '5px' }}>Opciones disponibles en la próxima versión.</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="sidebar-sections">
-                            {/* Placeholder for other KPIs */}
+                        {!['a5'].includes(selectedKpi) && (
+                          <div className="sidebar-sections" style={{ padding: '20px', textAlign: 'center' }}>
+                            <div style={{ opacity: 0.3, fontSize: '40px' }}>📊</div>
+                            <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '10px' }}>Módulo Activo</p>
                           </div>
                         )}
                       </div>
@@ -1654,57 +1751,13 @@ function App() {
                             </div>
                           )}
 
-                          {/* === SETTINGS VIEW (a5) === */}
+                          {/* === PEDIDOS VIEW (a5) === */}
                           {selectedKpi === 'a5' && (
-                            <div className="future-module-placeholder animate-pop" style={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                              <div className="module-header-modern">
-                                <div className="header-info">
-                                  <span className="module-tag">Área Registrada</span>
-                                  <h3 className="module-title">⚙️ CONFIGURACIÓN Y AJUSTES</h3>
-                                </div>
-                              </div>
-                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: '20px', marginTop: '20px', border: '2px dashed #e2e8f0' }}>
-                                <div style={{ textAlign: 'center', maxWidth: '400px', padding: '40px' }}>
-                                  <div style={{ fontSize: '60px', marginBottom: '20px' }}>🚧</div>
-                                  <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#1e293b', marginBottom: '10px' }}>PRÓXIMAMENTE</h2>
-                                  <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.6' }}>
-                                    Este módulo está reservado para futuras actualizaciones del sistema, configuraciones de usuario y ajustes avanzados.
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
+                            <PedidosManager API_BASE={API_BASE} />
                           )}
 
                           {selectedKpi === 'a6' && (
-                            <div className="sales-history-view animate-pop">
-                              <div className="mini-view-header">
-                                <h3>💰 HISTORIAL DE VENTAS (VENTAS)</h3>
-                              </div>
-                              <div className="mini-table-container">
-                                <table className="mini-table">
-                                  <thead>
-                                    <tr>
-                                      <th>FECHA</th>
-                                      <th>HORA</th>
-                                      <th>ART ÍCULOS</th>
-                                      <th>TOTAL</th>
-                                      <th>ACCIÓN</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {sales.map(s => (
-                                      <tr key={s.id}>
-                                        <td>{new Date(s.timestamp).toLocaleDateString()}</td>
-                                        <td>{new Date(s.timestamp).toLocaleTimeString()}</td>
-                                        <td>{Array.isArray(s.items) ? s.items.length : s.items_count}</td>
-                                        <td className="bold">€{parseFloat(s.total).toFixed(2)}</td>
-                                        <td><button className="btn-mini" onClick={() => alert('Detalle de venta no disponible')}>👁️</button></td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
+                            <div className="future-module-placeholder animate-pop"><h3>📊 VENTAS REALES</h3></div>
                           )}
 
                           {selectedKpi === 'a8' && (
